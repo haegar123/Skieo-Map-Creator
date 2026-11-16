@@ -1,12 +1,16 @@
-"""Data for the full-window 3D terrain view: a height grid (uint16, every 2nd landscape vertex) and a colour texture
-(forest below the treeline, snow and rock above it, rock on steep ground, water on dead-flat ground)."""
+"""Data for the full-window 3D terrain view: a height grid (uint16, every 2nd landscape vertex), a colour texture
+(forest floor where the map's trees stand, meadow elsewhere, snow above the treeline, rock on steep ground, water on
+dead-flat ground) and the trees themselves (spread like the map's forest)."""
 import io
 
 import numpy as np
 from PIL import Image
 
+from . import trees
+
 STEP = 2                     # 2017 -> 1009 x 1009 vertices (~2M triangles)
 TEX = 2048
+PREVIEW_TREES = 200_000      # ponytail: one cone shape, a sample of the forest; species and the full count if wanted
 
 
 def _slope(d, sp):
@@ -47,8 +51,30 @@ def _local_max(a, r):
     return out
 
 
-def build(dem, size_m, treeline_m):
-    """-> (heights uint16 bytes, meta dict, albedo JPEG bytes)"""
+def tree_points(dens, size_m, seed=7):
+    """-> float32 bytes [x, z, scale, shade] per tree (metres from the map's centre, z south like the 3D mesh's rows):
+    at most PREVIEW_TREES, spread by dens (0..1 per vertex, row 0 = north), as thick as the map's forest where dens is 1"""
+    n0 = dens.shape[0]
+    sp = size_m / (n0 - 1)
+    w = np.asarray(dens, np.float64).ravel()
+    tot = float(w.sum())
+    n = min(PREVIEW_TREES, int(trees.TREES_PER_KM2 * tot * sp * sp / 1e6))
+    if n <= 0:
+        return b''
+    rs = np.random.default_rng(seed)
+    cell = rs.choice(w.size, n, p=w / tot)
+    r, c = np.divmod(cell, n0)
+    out = np.empty((n, 4), np.float32)
+    out[:, 0] = (c + rs.uniform(-0.5, 0.5, n)).clip(0, n0 - 1) * sp - size_m / 2
+    out[:, 1] = (r + rs.uniform(-0.5, 0.5, n)).clip(0, n0 - 1) * sp - size_m / 2
+    out[:, 2] = rs.uniform(0.7, 1.3, n)
+    out[:, 3] = rs.random(n)
+    return out.tobytes()
+
+
+def build(dem, size_m, treeline_m, dens):
+    """-> (heights uint16 bytes, meta dict, albedo JPEG bytes, tree_points bytes); dens: the forest's density (0..1 per
+    vertex, trees.growable)"""
     d = np.asarray(dem, np.float64)
     n0 = d.shape[0]
     sp = size_m / (n0 - 1)
@@ -56,7 +82,8 @@ def build(dem, size_m, treeline_m):
     rng = max(hi - lo, 1.0)
     g = d[::STEP, ::STEP]
     q = np.clip(np.rint((g - lo) / rng * 65535.0), 0, 65535).astype('<u2')
-    meta = dict(n=int(g.shape[0]), hmin=lo, hmax=hi, size_m=float(size_m))
+    pts = tree_points(dens, size_m)
+    meta = dict(n=int(g.shape[0]), hmin=lo, hmax=hi, size_m=float(size_m), trees=len(pts) // 16)
 
     slope = _slope(_blur(d, max(1, int(round(12.0 / sp)))), sp)       # ~25 m scale: no rock on every creek bank
     big, fine = _noise(n0, 24, 5), _noise(n0, 96, 6)
@@ -69,8 +96,10 @@ def build(dem, size_m, treeline_m):
     # soft treeline band (~120 m) with a ragged edge, meadow patches in the forest
     above = np.clip((d - tl + 60.0 + big * 120.0) / 120.0, 0.0, 1.0)[..., None]
     m = np.clip(fine * 2.0 - 0.3, 0.0, 0.35)[..., None]
-    col = (forest[None, None] * (1 - m) + meadow[None, None] * m) * (1 - above) + snow[None, None] * above
-    steep = np.clip((slope - 26.0) / 7.0, 0.0, 1.0)[..., None]       # bare rock from ~33 deg, where the forest stops
+    f = np.clip(_blur(dens, 1), 0.0, 1.0)[..., None]                  # forest floor where the map's trees stand
+    below = meadow[None, None] + (forest[None, None] * (1 - m) + meadow[None, None] * m - meadow[None, None]) * f
+    col = below * (1 - above) + snow[None, None] * above
+    steep = (np.clip((slope - 26.0) / 7.0, 0.0, 1.0)[..., None]) * (1 - f)   # bare rock from ~33 deg, but not under trees
     col = col * (1 - steep) + rock[None, None] * steep
     flat = (_local_max(_slope(d, sp), max(3, int(round(30.0 / sp)))) < 0.6)[..., None]   # lakes: dead flat over ~60 m
     col = np.where(flat, water[None, None], col)
@@ -78,4 +107,4 @@ def build(dem, size_m, treeline_m):
     img = Image.fromarray(np.clip(col, 0, 255).astype(np.uint8)).resize((TEX, TEX), Image.BILINEAR)
     b = io.BytesIO()
     img.save(b, 'JPEG', quality=88)
-    return q.tobytes(), meta, b.getvalue()
+    return q.tobytes(), meta, b.getvalue(), pts

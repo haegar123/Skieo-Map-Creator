@@ -215,17 +215,24 @@ def header_tail(look):
     return struct.pack('<4f', *stats()['looks'][look or 'mrg']['header'])
 
 
-def plant(H, sp, sc, rng, open_mask, max_trees=DEFAULT_TREES, tree_slope=TREE_SLOPE, weight=None, clear=None):
-    """tree positions (x, y in metres from the landscape corner, z in metres above its bottom) at the stock density,
-    thinned evenly when that would give more than max_trees; none on ground steeper than tree_slope (deg);
-    weight (0..1 per vertex, optional) thins them further; clear (optional (bool raster, metres per cell), row = y)
-    marks ground kept free of trees (trails, lifts)"""
+def growable(H, hmin, sp, sc, treeline, valley, tree_slope=TREE_SLOPE, treeline_fade=0.0, cover=None):
+    """the share (0..1 per vertex, row = y) of the full forest density that grows there: none on open ground or
+    steeper than tree_slope (deg), thinning out over the last treeline_fade m below the treeline, times cover (the
+    real tree cover, optional). The map build and the 3D view both plant by this."""
+    ok = ((_local_max(_slope(H, sp, sc), 1) < tree_slope) & ~open_ground(H, hmin, sp, sc, treeline, valley)).astype(np.float64)
+    if treeline > 0 and treeline_fade > 0:
+        ok *= np.clip((treeline - ((H.astype(np.float64) + 32768) * sc + hmin)) / treeline_fade, 0.0, 1.0)
+    if cover is not None:
+        ok *= cover
+    return ok
+
+
+def plant(H, sp, sc, rng, ok, max_trees=DEFAULT_TREES, clear=None):
+    """tree positions (x, y in metres from the landscape corner, z in metres above its bottom) at the stock density
+    times ok (growable), thinned evenly when that would give more than max_trees; clear (optional (bool raster, metres
+    per cell), row = y) marks ground kept free of trees (trails, lifts)"""
     dens = stats()['density']
     ext = (G - 1) * sp
-    # vertices a tree may stand on: gentler than tree_slope, not open ground
-    ok = ((_local_max(_slope(H, sp, sc), 1) < tree_slope) & ~open_mask).astype(np.float64)
-    if weight is not None:
-        ok *= weight
     area_frac = max(float(ok.mean()), 0.01)                 # the share of the map trees can grow on
     n = min(int(ext * ext * dens), int(max_trees / area_frac))
     x = rng.uniform(0.5, ext - 0.5, n)
@@ -433,13 +440,8 @@ def forest(H, hmin, sp, sc, biome, treeline, valley, species, biome_species, see
     hdr_tail = header_tail(spec['look'])
     if not spec['look'] or not biome_species:
         return b'', encode_table([]), hdr_tail, {}
-    mask = open_ground(H, hmin, sp, sc, treeline, valley)
-    weight = None
-    if treeline > 0 and treeline_fade > 0:                 # forest thins out over the last treeline_fade m below it
-        weight = np.clip((treeline - ((H.astype(np.float64) + 32768) * sc + hmin)) / treeline_fade, 0.0, 1.0)
-    if cover is not None:
-        weight = cover if weight is None else weight * cover
-    x, y, z = plant(H, sp, sc, rng, mask, max_trees=max_trees, tree_slope=tree_slope, weight=weight, clear=clear)
+    ok = growable(H, hmin, sp, sc, treeline, valley, tree_slope, treeline_fade, cover)
+    x, y, z = plant(H, sp, sc, rng, ok, max_trees=max_trees, clear=clear)
     m = len(x)
 
     avail = [s for s in biome_species if s in species]

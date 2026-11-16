@@ -10,7 +10,9 @@ const FT = 3.28084;
 let R = null;          // { renderer, scene, camera, controls, mesh, skirt, pin, data, heights, tex, raf }
 let renderer = null;   // one WebGL context for the app's lifetime (browsers cap how many a page may create)
 let gen = 0;           // bumped by every open / close
+let jobId = null;      // the app's view3d job while it runs (closing cancels it)
 const LOAD_MS = 90000;
+const TREE_H = 20, TREE_R = 4.5;   // metres: a grown conifer
 const TOPO_MS = 180000;
 
 function q(s) { return encodeURIComponent(s); }
@@ -133,7 +135,61 @@ function setExaggeration(exag) {
   R.skirt.geometry = buildSkirt(R.data, H, exag);
   R.scene.add(R.skirt);
   if (R.pin && R.data.base) R.pin.position.y = heightAt(R.data.base[0], -R.data.base[1]) * exag;
+  if (R.trees) placeTrees(exag);
   R.exag = exag;
+}
+
+async function loadTrees(token, ver) {
+  const r = await fetch(`/blob/trees?t=${q(token)}&v=${ver}`);
+  if (!r.ok) throw new Error('trees ' + r.status);
+  return new Float32Array(await r.arrayBuffer());     // [x, z, scale, shade] per tree
+}
+
+function buildTrees(pts) {
+  /* the map's forest (a sample of it): one cone per tree, its colour varied a little */
+  const n = pts.length / 4;
+  if (!n) return null;
+  const geo = new THREE.ConeGeometry(TREE_R, TREE_H, 6);
+  geo.translate(0, TREE_H / 2, 0);
+  const m = new THREE.InstancedMesh(geo, new THREE.MeshStandardMaterial({ roughness: 0.9 }), n);
+  const dark = new THREE.Color(0x1f3a26), light = new THREE.Color(0x4a6a3a), c = new THREE.Color();
+  for (let i = 0; i < n; i++) m.setColorAt(i, c.lerpColors(dark, light, pts[i * 4 + 3]));
+  m.receiveShadow = true;                             // no castShadow: 200k shadow cones cost too much
+  return m;
+}
+
+function placeTrees(exag) {
+  const m = R.trees, p = R.treePts, o = new THREE.Object3D();
+  for (let i = 0; i < m.count; i++) {
+    const x = p[i * 4], z = p[i * 4 + 1];
+    o.position.set(x, heightAt(x, z) * exag - 1, z);
+    o.scale.setScalar(p[i * 4 + 2]);
+    o.updateMatrix();
+    m.setMatrixAt(i, o.matrix);
+  }
+  m.instanceMatrix.needsUpdate = true;
+  m.computeBoundingSphere();
+}
+
+async function runJob(params, onText) {
+  /* start api.view3d (a job) and poll it -> its result {ok, ...}, {ok: false, error} or {cancelled: true} */
+  const api = window.pywebview.api;
+  let j = await api.view3d(params);
+  if (!j || !j.ok) return j;
+  jobId = j.id;
+  try {
+    for (;;) {
+      if (j.id !== jobId) return { ok: false, error: 'Another task started.' };
+      if (j.state === 'done') return Object.assign({ ok: true }, j.result);
+      if (j.state === 'cancelled') return { cancelled: true };
+      if (j.state === 'error') return { ok: false, error: j.error };
+      if (j.text) onText(j.text);
+      await new Promise((res) => setTimeout(res, 400));
+      j = await api.job();
+    }
+  } finally {
+    jobId = null;
+  }
 }
 
 async function topoTexture(bbox, opts, onProgress) {
@@ -243,16 +299,18 @@ export async function open(opts) {
   setStatus('Building the 3D view...');
   let res;
   try {
-    res = await withTimeout(window.pywebview.api.view3d(opts.treeline), LOAD_MS, 'Building the 3D view');
+    res = await runJob(opts.forest, (text) => { if (my === gen) setStatus(text); });   // no timeout: the job reports and can be cancelled
   } catch (e) {
     return fail('The 3D view could not be built (' + (e && e.message || e) + '). Please try again.');
   }
   if (my !== gen) return;
+  if (res && res.cancelled) return close();
   if (!res || !res.ok) return fail(res && res.error || 'No answer from the app.');
   try {
     setStatus('Loading the terrain...');
-    const [heights, tex] = await withTimeout(Promise.all([loadHeights(opts.token, res.version),
-      loadTexture(`/blob/albedo?t=${q(opts.token)}&v=${res.version}`)]), LOAD_MS, 'Loading the terrain');
+    const [heights, tex, pts] = await withTimeout(Promise.all([loadHeights(opts.token, res.version),
+      loadTexture(`/blob/albedo?t=${q(opts.token)}&v=${res.version}`), loadTrees(opts.token, res.version)]),
+    LOAD_MS, 'Loading the terrain');
     if (my !== gen) { tex.dispose(); return; }
     const renderer = getRenderer();
     const s = res.size_m, range = res.hmax - res.hmin;
@@ -269,6 +327,9 @@ export async function open(opts) {
     R.skirt = new THREE.Mesh(buildSkirt(res, heights, R.exag),
       new THREE.MeshStandardMaterial({ color: 0x6b4a34, roughness: 1, side: THREE.DoubleSide }));
     scene.add(R.mesh, R.skirt);
+    R.treePts = pts;
+    R.trees = buildTrees(pts);
+    if (R.trees) { placeTrees(R.exag); scene.add(R.trees); }
     scene.add(new THREE.HemisphereLight(0xe3eef7, 0x6a5a4c, 1.05));
     const sun = new THREE.DirectionalLight(0xfff3e0, 2.1);
     sun.position.set(-s * 0.8, range * 2 + s * 0.7, -s * 0.35);
@@ -304,7 +365,7 @@ export async function open(opts) {
       (opts.units === 'm' ? `${Math.round(res.hmin)}–${Math.round(res.hmax)} m` :
         `${Math.round(res.hmin * FT).toLocaleString('en-US')}–${Math.round(res.hmax * FT).toLocaleString('en-US')} ft`);
     R.opts = opts;
-    setStatus('');
+    setStatus(res.note || '', 'note');
     $('v3dPeakLbl').classList.remove('hidden');
     $('v3dCanvas').style.visibility = '';
     loop();
@@ -315,6 +376,7 @@ export async function open(opts) {
 
 export function close() {
   gen++;                                            // drops any load still under way
+  if (jobId) window.pywebview.api.cancel();         // and the app's job building it
   setStatus('');
   $('v3d').classList.add('hidden');
   window.removeEventListener('resize', onResize);

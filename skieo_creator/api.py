@@ -505,17 +505,40 @@ class Api:
         return dict(summary=resort.summary(pl), lines=resort.overlay(pl, terrain))
 
     @_safe
-    def view3d(self, treeline_m=None):
-        """heights + colour texture of the loaded terrain for the 3D view (served from the local server)"""
+    def view3d(self, params=None):
+        """job: heights, colour texture and trees of the loaded terrain for the 3D view (served from the local server);
+        params: the forest settings of the create dialog, so the view has the forest the map will have"""
         pv = self._preview
         if not pv:
             raise UserError('Load the terrain first.')
+        p = params or {}
+        if p.get('osm') and not pv.get('osm'):
+            raise UserError('Load the trails and lifts first.')
+        return self._run('view3d', lambda job: self._do_view3d(job, pv, p))
+
+    def _do_view3d(self, job, pv, p):
         from . import view3d
-        tl = float(treeline_m) if treeline_m is not None else 0.0
-        heights, meta, albedo = view3d.build(pv['dem'], pv['size_km'] * 1000.0, tl)
+        size_m = pv['size_km'] * 1000.0
+        tl = float(np.clip(float(p.get('treeline_m') or 0), 0, 9000))
+        spec = dict(lat=pv['lat'], lon=pv['lon'], size_m=size_m, real_forest=bool(p.get('real_forest')),
+                    osm_skip=sorted({int(i) for i in p.get('osm_skip') or ()}))
+        job.progress(0.02, 'Planting the forest...')
+        H, fr = builder.heights(pv['dem'], size_m)
+        _, _, avoid, cover, forest_ok = builder.forest_inputs(
+            spec, H, fr, json.loads(pv['osm']) if p.get('osm') else None, job.cancel, lambda f, t: job.progress(0.05, t))
+        job.cancel.check()
+        dens = trees.growable(H, fr.hmin, fr.sp, fr.sc, tl, float(np.clip(float(p.get('valley_m') or 0), 0, 9000)),
+                              float(np.clip(float(p.get('tree_slope') or trees.TREE_SLOPE), trees.MIN_TREE_SLOPE, trees.MAX_TREE_SLOPE)),
+                              float(np.clip(float(p.get('treeline_fade', trees.TREELINE_FADE)), 0, trees.MAX_TREELINE_FADE)), cover)
+        if avoid is not None:
+            dens *= ~avoid
+        job.progress(0.8, 'Building the 3D view...')
+        heights, meta, albedo, tree_pts = view3d.build(pv['dem'], size_m, tl, dens)
         ver = secrets.token_hex(4)
         server.BLOBS['heights'] = (heights, 'application/octet-stream')
         server.BLOBS['albedo'] = (albedo, 'image/jpeg')
+        server.BLOBS['trees'] = (tree_pts, 'application/octet-stream')
+        note = 'The satellite tree heights could not be loaded: this shows the generated forest.' if forest_ok is False else ''
         g = geo.LocalGrid(pv['lat'], pv['lon'])
         half = pv['size_km'] * 500.0
         base = pv.get('base')
@@ -527,7 +550,7 @@ class Api:
         lat_s, lon_e = g.to_latlon(half, -half)
         r, c = np.unravel_index(int(np.argmax(pv['dem'])), pv['dem'].shape)
         sp = pv['size_km'] * 1000.0 / (pv['dem'].shape[0] - 1)
-        return dict(meta, version=ver, base=[bx, by] if bx is not None else None,
+        return dict(meta, version=ver, note=note, base=[bx, by] if bx is not None else None,
                     peak=[float(c * sp - half), float(half - r * sp)],
                     bbox=dict(n=float(lat_n), s=float(lat_s), w=float(lon_w), e=float(lon_e)))
 

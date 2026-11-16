@@ -61,6 +61,11 @@ For players, see the [README](../README.md).
 The window is a local web UI (`web/`: Leaflet map, three.js 3D preview) shown by pywebview / WebView2. `server.py`
 serves it on 127.0.0.1, with a token-protected tile proxy on its own port.
 
+The 3D preview (`api.view3d`, a job; `view3d.py`; `web/viewer3d.js`) shows the forest the map will get: it takes the
+create dialog's forest settings and goes through the build's own `builder.forest_inputs` (trails and lifts cleared,
+real tree cover) and `trees.growable` (treeline, fade, valley floor, tree slope), then draws a sample of up to
+`view3d.PREVIEW_TREES` trees as instanced cones over a forest-floor texture.
+
 Mods are not the Map Creator's business any more: they come from Z's Mod Loader. The Mod Library of versions 1.2 to
 1.8 (removed in 1.9; its code is in the git history) installed UE4SS, Lua mods and lift and building packs into the
 game; `oldmods.py` takes out what it installed, once per game folder, the first time the game is found closed, by its
@@ -169,6 +174,7 @@ python packaging/make_save_template.py <a .sav with a ticket office> <out>\SkiRe
 | `tests/ui_drive.py` | scripted UI sessions with screenshots (`search`, `3d`, `3d-offline`, `numbox`, `osm`, ...) |
 | `tests/test_resort.py` | self-check of the trail and lift import rules on made-up data |
 | `tests/test_trees.py` | self-check of the forest on a made-up mountain (no game, no downloads) |
+| `tests/test_view3d.py` | self-check of the 3D preview's trees (only where the forest grows) on a made-up hill |
 | `tests/test_dem.py` | self-check of reading where the USGS elevation image really is (its GeoTIFF tags), and of Sonny's local tiles on made-up data (finding them in folders and zips, joining them across tile edges, filling gaps) |
 | `tests/test_update.py` | self-check of the self-update (release lookup, checksums, swapping the exe) without the network |
 | `tests/test_install.py` | self-check of the map list entries (never a tutorial map, the once-only rebuild of older ones) |

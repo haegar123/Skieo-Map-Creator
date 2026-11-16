@@ -554,34 +554,15 @@ def entry_spec(names, display, biome, stats, start_save=False):
     return spec
 
 
-def build(spec, dem, game, out_dir, cancel, progress):
-    """spec: dict(name, slug, lat, lon, size_m, biome, treeline, valley, snow, acres, base_rc, seed, tg; osm: build in
-    the real trails and lifts from out_dir/osm.json)
-    game: GameData. Returns dict(files=[...], manifest=..., preview=PIL image, stats=...)"""
-    with BUILD_LOCK:
-        return _build(spec, dem, game, Path(out_dir), cancel, progress)
-
-
-def _build(spec, dem, game, out_dir, cancel, progress):
-    t0 = time.time()
-    names = Names(spec['slug'])
-    gd = game.files()
-
-    def stage(a, b):
-        return lambda f, t: progress(a + (b - a) * f, t)
-
-    H, fr = heights(dem, spec['size_m'])
-    H = fit_edges(H, mf.wall_stations(gd['umap'], gd['uexp']))
-    peak_m, base_m = fr.hmin + 65534 * fr.sc, fr.hmin
+def forest_inputs(spec, H, fr, osm, cancel, progress):
+    """-> (plan, clear, avoid, cover, forest_ok): the real resort's plan (osm: its parsed OpenStreetMap data, or None),
+    the ground kept free of trees (clear: trees.plant's raster, avoid: the same per vertex), the real tree cover (cover:
+    round the resort, or over the whole map with spec['real_forest']) and whether that real forest was had (None: not
+    asked). The map build and the 3D view both take their forest from this."""
     pl = clear = avoid = cover = terrain = None
     whole = bool(spec.get('real_forest'))  # option "Real forest": the real tree cover over the whole map
     forest_ok = True if whole else None
-    if spec.get('osm'):                    # the real resort's trails and lifts (OpenStreetMap data saved with the map)
-        progress(0.01, 'Laying out the real trails and lifts...')
-        try:
-            osm = json.loads((out_dir / 'osm.json').read_bytes())
-        except (OSError, ValueError):
-            raise BuildError('This map\'s trail and lift data is missing. Create the map again.')
+    if osm is not None:
         terrain = resort.Terrain(H, fr, spec['lat'], spec['lon'], spec['size_m'])
         pl = resort.plan(osm, terrain, skip=spec.get('osm_skip', ()), canopy=lambda la, lo: canopy.heights(
             la, lo, cancel, lambda f, t: progress(0.01, t)))      # the same blocks the preview read: cached
@@ -602,6 +583,36 @@ def _build(spec, dem, game, out_dir, cancel, progress):
                 pl['tree_check'] = False   # built with the generated forest: shows "Rebuild recommended"
             if whole:
                 forest_ok = False
+    return pl, clear, avoid, cover, forest_ok
+
+
+def build(spec, dem, game, out_dir, cancel, progress):
+    """spec: dict(name, slug, lat, lon, size_m, biome, treeline, valley, snow, acres, base_rc, seed, tg; osm: build in
+    the real trails and lifts from out_dir/osm.json)
+    game: GameData. Returns dict(files=[...], manifest=..., preview=PIL image, stats=...)"""
+    with BUILD_LOCK:
+        return _build(spec, dem, game, Path(out_dir), cancel, progress)
+
+
+def _build(spec, dem, game, out_dir, cancel, progress):
+    t0 = time.time()
+    names = Names(spec['slug'])
+    gd = game.files()
+
+    def stage(a, b):
+        return lambda f, t: progress(a + (b - a) * f, t)
+
+    H, fr = heights(dem, spec['size_m'])
+    H = fit_edges(H, mf.wall_stations(gd['umap'], gd['uexp']))
+    peak_m, base_m = fr.hmin + 65534 * fr.sc, fr.hmin
+    osm = None
+    if spec.get('osm'):                    # the real resort's trails and lifts (OpenStreetMap data saved with the map)
+        progress(0.01, 'Laying out the real trails and lifts...')
+        try:
+            osm = json.loads((out_dir / 'osm.json').read_bytes())
+        except (OSError, ValueError):
+            raise BuildError('This map\'s trail and lift data is missing. Create the map again.')
+    pl, clear, avoid, cover, forest_ok = forest_inputs(spec, H, fr, osm, cancel, progress)
     row, col = base_site(H, fr, *spec['base_rc'], radius=40, avoid=avoid)
     base_h = int(H[row, col])
     cancel.check()
@@ -634,7 +645,8 @@ def _build(spec, dem, game, out_dir, cancel, progress):
     if pl:                                 # the real resort's lifts and trails: New Game starts from a save with them
         progress(0.25, 'Starting save...')
         gv = startsave.build(fr, spec['tg'], row, col, base_h, names, preview_pose(fr)[1])
-        wrapped = resort.add_to_save(b'\0\0' + struct.pack('<i', len(gv)) + gv, pl, terrain)   # (asset-wrapped GVAS)
+        wrapped = resort.add_to_save(b'\0\0' + struct.pack('<i', len(gv)) + gv, pl,      # (asset-wrapped GVAS)
+                                     resort.Terrain(H, fr, spec['lat'], spec['lon'], spec['size_m']))
         is_ua, is_ue = save_asset(gd, wrapped[6:6 + struct.unpack_from('<i', wrapped, 2)[0]])
         is_ua = names.rename(is_ua, 'is', '/Game/InitialSaves/' + IS_OLD, names.p_is)
         files.update({C + 'InitialSaves/%s.uasset' % names.is_new: is_ua, C + 'InitialSaves/%s.uexp' % names.is_new: is_ue})

@@ -5,7 +5,7 @@
 Map Creator 1.8.2: echtes Gelände (USGS 3DEP in den USA, AWS Terrain Tiles sonst), Wald nach Spiel-Biomen mit
 Baumbudget, echte Pisten und Lifte aus OpenStreetMap, Installation ins Spiel, Mod Library. Neu (noch nicht
 veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" v25" aus einem lokalen Ordner; Option
-„Real forest“ (Bäume nur, wo Satellitenbilder Wald zeigen).
+„Real forest“ (Bäume nur, wo Satellitenbilder Wald zeigen); 3D-Ansicht zeigt den Wald der Karte.
 
 ## Erledigt
 
@@ -28,6 +28,11 @@ veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" 
   `web/index.html`, `web/app.js`). Download fehlgeschlagen → generierter Wald + „Rebuild recommended“
   (`builder.recipe`, Stat `real_forest=False`). Tests in `tests/test_resort.py`; in der App vom Nutzer getestet:
   realistische Wälder (2026-11-16)
+- 3D-Ansicht zeigt den Wald, den die Karte bekommt: bis 200k Baumkegel (InstancedMesh) über Waldboden-Textur, mit den
+  Einstellungen des Erstellen-Dialogs inkl. OSM-Schneisen und Real forest. `api.view3d` ist jetzt ein Job (Fortschritt
+  im 3D-Lade-Pill, Esc bricht ab). Gemeinsame Waldlogik für Vorschau und Build: `trees.growable`,
+  `builder.forest_inputs` (`skieo_creator/view3d.py`, `web/viewer3d.js`, `web/app.js`); Test `tests/test_view3d.py`;
+  in der App (Killington) geprüft, vom Nutzer abgenommen (2026-11-16)
 
 ## Offen
 
@@ -35,6 +40,7 @@ veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" 
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
 - `tests/test_modlib.py` schlägt gelegentlich fehl (auch ohne diese Änderung): Ursache suchen
 - Real forest: Offline-Fall (Netz aus, Cache leer → „Rebuild recommended“) noch nicht in der App geprüft
+- 3D-Wald: noch nicht geprüft mit Real forest an, mit OSM-Pisten und auf 20-km-Karte (Bildrate)
 - Sisters bis in den Sommer spielen, dann prüfen, ob die OSM-Gletscherflächen weiß bleiben (Beleg für permanenten
   Schnee; Auswerte-Skripte waren nur im Scratchpad)
 
@@ -51,6 +57,8 @@ veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" 
   Kronenhöhen weltweit und schon im Code; Standard aus, weil es das Aussehen jeder neuen Karte ändert
 - _Real forest erhöht RECIPE nicht_ — alte Karten ändern sich nicht; nur ein fehlgeschlagener Download zählt eins
   weniger
+- _3D-Vorschau und Build teilen `growable`/`forest_inputs`_ — sonst zeigt die Vorschau einen anderen Wald als das
+  Spiel; Kegel ohne Schattenwurf und nur eine Form (200k Schattenkegel zu teuer; Arten trennen, wenn gewünscht)
 - _Design-Hook: `broken-image` in `web/index.html` ignoriert_ (`.impeccable/config.json`) — `#diorama`/`#doneImg`
   bekommen ihr `src` zur Laufzeit von `app.js`
 - _Kein Schnee aus OSM-Gletschern_ — Schnee ist eine Simulation im Spielstand (`SnowData`, int32-Länge + zlib,

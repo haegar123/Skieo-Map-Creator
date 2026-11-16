@@ -297,7 +297,8 @@ async function prepareGame() {
 /* ------------------------------------------------------------ jobs */
 
 const JOB_TITLES = { prepare: 'Preparing', preview: 'Loading terrain', osm: 'Loading the trails and lifts', create: 'Creating map', install: 'Installing',
-  uninstall: 'Removing', delete: 'Deleting', rebuild: 'Rebuilding', repair: 'Repairing the map list', update: 'Updating' };
+  uninstall: 'Removing', delete: 'Deleting', rebuild: 'Rebuilding', repair: 'Repairing the map list', update: 'Updating',
+  view3d: 'Building the 3D view' };
 
 function startJob(j) {
   S.job = j;
@@ -341,6 +342,7 @@ window.app = {
 };
 
 function jobFinished(j) {
+  if (j.kind === 'view3d') return updateButtons();   // the 3D view shows its own result and errors
   if (j.kind === 'osm' && j.state !== 'done') { $('osm').checked = false; clearOsm(); }
   if (j.state === 'cancelled') { toast('Cancelled'); return refreshGame(); }
   if (j.state === 'error') { refreshGame(); return errorBox(j.error); }
@@ -469,7 +471,12 @@ $('photo').onclick = () => {
   if (!S.preview || !window.terrain3d) return;
   window.terrain3d.open({
     token: S.token, tiles: S.tiles, name: $('name').value.trim() || S.suggestName || 'Terrain', units: S.units,
-    treeline: +$('treeline').value, onError: (msg) => errorBox(msg),
+    forest: {                         // the forest the map will have: the same settings as Create
+      treeline_m: +$('treeline').value, valley_m: +$('valley').value, tree_slope: +$('slope').value,
+      treeline_fade: +$('fade').value, real_forest: $('realForest').checked,
+      osm: $('osm').checked && !!S.osm, osm_skip: S.osmSkip ? [...S.osmSkip] : [],
+    },
+    onError: (msg) => errorBox(msg),
   });
 };
 

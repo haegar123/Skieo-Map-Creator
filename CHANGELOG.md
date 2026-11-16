@@ -7,6 +7,10 @@ Maps made with an older version show **Rebuild recommended** in My Maps: one cli
   (Meta / WRI tree heights), over the whole map. Meadows, lava fields and clearings stay open and the forest ends at
   the real forest edge. The tree heights download once (about 10–50 MB); without internet the map is built with the
   generated forest and shows **Rebuild recommended**.
+- **The 3D view shows the forest** the map will have: trees where they will stand, with the settings of the create
+  dialog (treeline, tree slope, valley floor, the real trails and lifts cut out, Real forest). Meadows, open bowls and
+  cliffs show bare. With Real forest on, the first opening downloads the satellite tree heights (shown in the 3D view,
+  Esc cancels); creating the map afterwards uses the same download.
 
 ## v1.10.0
 - **Maps built from the ground up.** Every map used to be a copy of one of the game's own maps (Mad River Glen) with
