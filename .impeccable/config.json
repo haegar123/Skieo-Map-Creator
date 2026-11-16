@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "web/index.html"
+        ],
+        "createdAt": "2026-11-16T19:13:26.249Z",
+        "reason": "Claude: #diorama and #doneImg get their src from app.js at runtime (preview images), pre-existing, not placeholders"
+      }
+    ]
+  }
+}

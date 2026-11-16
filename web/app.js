@@ -648,7 +648,7 @@ $('createBtn').onclick = async () => {
   const r = await call('create', {
     name, lat: S.preview.lat, lon: S.preview.lon, size_km: S.preview.size_km, biome: $('biome').value,
     treeline_m: +$('treeline').value, snow: +$('snow').value, valley_m: +$('valley').value, max_trees: +$('trees').value,
-    experimental: $('expTrees').checked, tree_slope: +$('slope').value, treeline_fade: +$('fade').value,
+    experimental: $('expTrees').checked, real_forest: $('realForest').checked, tree_slope: +$('slope').value, treeline_fade: +$('fade').value,
     base: S.preview.base,             // flattest low ground, picked when the terrain loaded (with real lifts: their base)
     osm: $('osm').checked && !!S.osm, osm_skip: S.osmSkip ? [...S.osmSkip] : [],
   });

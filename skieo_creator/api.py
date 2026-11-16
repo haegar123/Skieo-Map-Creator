@@ -607,7 +607,7 @@ class Api:
                     acres=int(np.clip(int(params.get('acres') or 0) or self._acres(size_m), 10, 50000)),
                     base_rc=[row, col], base_latlon=[float(base[0]), float(base[1])],
                     source=pv['src'], seed=secrets.randbelow(2 ** 31 - 1) + 1, tg=secrets.randbelow(2 ** 31 - 2) + 1,
-                    game=st, osm=osm, osm_skip=osm_skip)
+                    game=st, osm=osm, osm_skip=osm_skip, real_forest=bool(params.get('real_forest')))
 
     @staticmethod
     def _acres(size_m):
@@ -619,7 +619,7 @@ class Api:
         slug = builder.new_slug(p['name'], taken)
         spec = dict((k, p[k]) for k in ('name', 'lat', 'lon', 'size_m', 'biome', 'treeline', 'valley', 'snow', 'max_trees',
                                         'experimental', 'tree_slope', 'treeline_fade', 'acres', 'base_rc', 'base_latlon',
-                                        'seed', 'tg', 'source'))
+                                        'seed', 'tg', 'source', 'real_forest'))
         spec['slug'] = slug
         if p['osm']:                       # kept with the map, so a rebuild makes the same trails and lifts
             paths.atomic_write(paths.MAPS / slug / 'osm.json', p['osm'])

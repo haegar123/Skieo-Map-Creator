@@ -1065,30 +1065,34 @@ def _box_sum(a, r):
 def tree_cover(pl, terrain, canopy):
     """-> the share (0..1) of the generated forest's density to keep at each terrain vertex (row = y): the real tree
     cover (canopy heights, lat, lon -> m, COVER_NODATA where unknown) within COVER_BUF_M of the runs, glades and lifts,
-    blending into 1 over COVER_FEATHER_M beyond; None when the plan has nothing to go round"""
+    blending into 1 over COVER_FEATHER_M beyond; None when the plan has nothing to go round. pl None: the real cover
+    over the whole map (option "Real forest")"""
     n, sp = terrain.n, terrain.sp
-    img = Image.new('L', (n, n), 0)
-    dr = ImageDraw.Draw(img)
-    rad = (COVER_BUF_M + COVER_FEATHER_M / 2) / sp      # the blur below ramps this edge over COVER_FEATHER_M
+    if pl is None:
+        near = np.ones((n, n))
+    else:
+        img = Image.new('L', (n, n), 0)
+        dr = ImageDraw.Draw(img)
+        rad = (COVER_BUF_M + COVER_FEATHER_M / 2) / sp  # the blur below ramps this edge over COVER_FEATHER_M
 
-    def px(P):
-        return [(float(x) / sp, float(y) / sp) for x, y in P]
+        def px(P):
+            return [(float(x) / sp, float(y) / sp) for x, y in P]
 
-    lines = [(t['P'], t['shape'] == 'Bowl') for t in pl['trails']] + \
-            [(g['P'], g['closed']) for g in pl['glades'] if g['P'] is not None] + \
-            [([p[:2] for p in l['wp']], False) for l in pl['lifts']]
-    if not lines:
-        return None
-    for P, area in lines:
-        pts = px(P)
-        if area and len(pts) > 2:
-            dr.polygon(pts, fill=1)
-        if len(pts) > 1:
-            dr.line(pts, fill=1, width=max(1, int(round(2 * rad))), joint='curve')
-        for x, y in (pts[0], pts[-1]):
-            dr.ellipse([x - rad, y - rad, x + rad, y + rad], fill=1)
-    fr = max(1, int(round(COVER_FEATHER_M / sp / 2)))
-    near = _box_sum(np.array(img, np.float64), fr) / _box_sum(np.ones((n, n)), fr)     # (only the part inside the map)
+        lines = [(t['P'], t['shape'] == 'Bowl') for t in pl['trails']] + \
+                [(g['P'], g['closed']) for g in pl['glades'] if g['P'] is not None] + \
+                [([p[:2] for p in l['wp']], False) for l in pl['lifts']]
+        if not lines:
+            return None
+        for P, area in lines:
+            pts = px(P)
+            if area and len(pts) > 2:
+                dr.polygon(pts, fill=1)
+            if len(pts) > 1:
+                dr.line(pts, fill=1, width=max(1, int(round(2 * rad))), joint='curve')
+            for x, y in (pts[0], pts[-1]):
+                dr.ellipse([x - rad, y - rad, x + rad, y + rad], fill=1)
+        fr = max(1, int(round(COVER_FEATHER_M / sp / 2)))
+        near = _box_sum(np.array(img, np.float64), fr) / _box_sum(np.ones((n, n)), fr)  # (only the part inside the map)
     sel = near > 1e-3
     k = max(1, int(round(sp / COVER_STEP_M)))           # samples per vertex cell, each way
     off = ((np.arange(k) + 0.5) / k - 0.5) * sp

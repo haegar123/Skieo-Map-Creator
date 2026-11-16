@@ -2,6 +2,12 @@
 
 Maps made with an older version show **Rebuild recommended** in My Maps: one click on Rebuild gives them the fixes.
 
+## Next version
+- **Real forest** (new option under Max trees, off by default): trees only where satellite images show forest
+  (Meta / WRI tree heights), over the whole map. Meadows, lava fields and clearings stay open and the forest ends at
+  the real forest edge. The tree heights download once (about 10–50 MB); without internet the map is built with the
+  generated forest and shows **Rebuild recommended**.
+
 ## v1.10.0
 - **Maps built from the ground up.** Every map used to be a copy of one of the game's own maps (Mad River Glen) with
   the terrain swapped, its forest learned from Mad River Glen's and Sugar Bowl's, and its starting save Sugar Bowl's

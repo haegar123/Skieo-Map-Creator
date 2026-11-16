@@ -51,6 +51,10 @@ For players, see the [README](../README.md).
      canopy with no cleared corridor in the satellite canopy heights (`canopy.py`). A run drawn twice in OSM is built
      once. Within 300 m of the runs, glades and lifts the forest follows the real tree cover from the same canopy
      heights (`resort.tree_cover`), so open bowls and meadows stay open.
+   - **Real forest** (optional, `spec['real_forest']`, any map): `resort.tree_cover(None, ...)` takes the real tree
+     cover over the whole map instead of only round the resort; the generated forest's density is multiplied by it
+     (it only removes trees; no canopy data keeps the generated forest). A failed download builds with the generated
+     forest and the map shows "Rebuild recommended" (`builder.recipe`).
 4. **Pack and install**: retoc `to-zen` packs a `ZZZ_MC_<name>_P` pak. `install.py` adds the map to the game's
    map list (`ZZZ_Registry_P`) and copies it into `Content/Paks/~mods`.
 

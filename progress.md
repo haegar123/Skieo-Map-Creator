@@ -4,7 +4,8 @@
 
 Map Creator 1.8.2: echtes Gelände (USGS 3DEP in den USA, AWS Terrain Tiles sonst), Wald nach Spiel-Biomen mit
 Baumbudget, echte Pisten und Lifte aus OpenStreetMap, Installation ins Spiel, Mod Library. Neu (noch nicht
-veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" v25" aus einem lokalen Ordner.
+veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" v25" aus einem lokalen Ordner; Option
+„Real forest“ (Bäume nur, wo Satellitenbilder Wald zeigen).
 
 ## Erledigt
 
@@ -22,14 +23,18 @@ veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" 
   Abweichung zu AWS im Median < 1 m, keine Naht
 - Manueller Test in der App nach Testanleitung (Ordner wählen, Laden, Vergleich, Kachelgrenze, Lücke, Karte bauen)
   vom Nutzer als erfolgreich bestätigt (2026-11-16)
+- Option „Real forest“ (Standard aus): echte Baumbedeckung aus den Meta/WRI-Kronenhöhen über die ganze Karte, auch
+  ohne OSM (`resort.tree_cover(None, …)`, `builder._build`, `spec['real_forest']` in `map.json`; Schalter in
+  `web/index.html`, `web/app.js`). Download fehlgeschlagen → generierter Wald + „Rebuild recommended“
+  (`builder.recipe`, Stat `real_forest=False`). Tests in `tests/test_resort.py`; in der App vom Nutzer getestet:
+  realistische Wälder (2026-11-16)
 
 ## Offen
 
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
 - `tests/test_modlib.py` schlägt gelegentlich fehl (auch ohne diese Änderung): Ursache suchen
-- **Nächste Sitzung:** Option „Real forest“ umsetzen, Plan in `docs/plans/real-forest.md`: Satelliten-Kronenhöhen
-  über die ganze Karte (`resort.tree_cover(None, …)`), Checkbox im Erstellen-Dialog, Standard aus
+- Real forest: Offline-Fall (Netz aus, Cache leer → „Rebuild recommended“) noch nicht in der App geprüft
 - Sisters bis in den Sommer spielen, dann prüfen, ob die OSM-Gletscherflächen weiß bleiben (Beleg für permanenten
   Schnee; Auswerte-Skripte waren nur im Scratchpad)
 
@@ -44,6 +49,10 @@ veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" 
 - _Sonny ist nicht feiner als AWS (1" ≈ 31 × 21 m)_ — Gewinn ist LiDAR-Qualität (Boden statt Baumkronen, schärfere Grate)
 - _Echter Wald aus Satellit, nicht aus OSM-Waldpolygonen_ — OSM-Wald oft lückenhaft (fehlende Fläche = kahler Hang),
   Kronenhöhen weltweit und schon im Code; Standard aus, weil es das Aussehen jeder neuen Karte ändert
+- _Real forest erhöht RECIPE nicht_ — alte Karten ändern sich nicht; nur ein fehlgeschlagener Download zählt eins
+  weniger
+- _Design-Hook: `broken-image` in `web/index.html` ignoriert_ (`.impeccable/config.json`) — `#diorama`/`#doneImg`
+  bekommen ihr `src` zur Laufzeit von `app.js`
 - _Kein Schnee aus OSM-Gletschern_ — Schnee ist eine Simulation im Spielstand (`SnowData`, int32-Länge + zlib,
   2× float16, Kanal 0 = Höhe in cm), startet bei 0; auf Sisters liegt der Tiefschnee schon ohne Zutun auf den
   OSM-Gletschern (91 % der Fläche > 1 m, Median 484 cm gegenüber 63 cm daneben)

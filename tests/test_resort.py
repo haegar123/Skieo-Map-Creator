@@ -111,6 +111,14 @@ assert float(unknown.min()) == 1.0, 'no canopy data: the generated forest stays 
 edge = resort.tree_cover(dict(trails=[dict(P=np.array([[30.0, 500.0], [30.0, 3500.0]]), shape='Corridor')], glades=[],
                               lifts=[]), terrain, lambda la, lo: np.zeros(np.size(la), np.uint8))
 assert float(edge[int(2000 / fr.sp), 0]) < 0.01, 'open ground by a run at the map edge stays open up to the edge'
+# option "Real forest": the real cover over the whole map, also far from the lift and the run
+whole = resort.tree_cover(None, terrain, bowl_open)
+assert whole[int(300 / fr.sp), int(300 / fr.sp)] == 1.0 and whole.dtype == np.float32 and whole.shape == H.shape
+assert float(whole[int(1800 / fr.sp), int(3000 / fr.sp)]) < 0.05, 'open ground stays open beyond COVER_BUF_M too'
+bare = resort.tree_cover(None, terrain, lambda la, lo: np.zeros(np.size(la), np.uint8))
+assert float(bare.max()) == 0.0, 'no tree crowns anywhere: no trees'
+unknown = resort.tree_cover(None, terrain, lambda la, lo: np.full(np.size(la), resort.COVER_NODATA, np.uint8))
+assert float(unknown.min()) == 1.0, 'no canopy data: the generated forest stays'
 
 # ---- found in review: station tags survive the tagless 'out skel' copy; multipolygon piste areas; unnamed areas drawn
 # round a run; the base stays inside the square's margin; a timed-out Overpass answer is not accepted
@@ -202,6 +210,7 @@ pl4 = resort.plan(osm3, terrain, canopy=offline)
 assert 'Tree Run' in {t['name'] for t in pl4['trails']} and len(pl4['notes']) == 1, pl4['notes']
 assert (pl3['tree_check'], tagged_only['tree_check'], pl4['tree_check']) == (True, None, False)
 assert builder.recipe({'osm': True}, dict(tree_check=False)) < builder.recipe({'osm': True})    # asks to be rebuilt
+assert builder.recipe({}, dict(real_forest=False)) < builder.recipe({}) == builder.recipe({}, dict(real_forest=True))
 assert resort.chm._quadkey(304, 375) == '0302330222'     # the canopy file over Stratton (zoom-10 tile 304, 375)
 
 # ---- the same run drawn twice (a newer piste line beside the older road with the run's name): built once

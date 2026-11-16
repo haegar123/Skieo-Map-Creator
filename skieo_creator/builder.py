@@ -78,11 +78,10 @@ BUILD_LOCK = threading.Lock()                     # frame.py holds the map frame
 
 
 def recipe(spec, stats=None):
-    """the recipe a map is built to; an OSM map built without the satellite tree check (download failed) gets one less,
-    so it shows "Rebuild recommended" """
-    if not spec.get('osm'):
-        return RECIPE
-    return RECIPE_OSM - (1 if stats and stats.get('tree_check') is False else 0)
+    """the recipe a map is built to; a map built without the satellite tree check or the real forest it asked for
+    (download failed) gets one less, so it shows "Rebuild recommended" """
+    failed = bool(stats) and (stats.get('tree_check') is False or stats.get('real_forest') is False)
+    return (RECIPE_OSM if spec.get('osm') else RECIPE) - (1 if failed else 0)
 
 
 class BuildError(Exception):
@@ -574,7 +573,9 @@ def _build(spec, dem, game, out_dir, cancel, progress):
     H, fr = heights(dem, spec['size_m'])
     H = fit_edges(H, mf.wall_stations(gd['umap'], gd['uexp']))
     peak_m, base_m = fr.hmin + 65534 * fr.sc, fr.hmin
-    pl = clear = avoid = cover = None
+    pl = clear = avoid = cover = terrain = None
+    whole = bool(spec.get('real_forest'))  # option "Real forest": the real tree cover over the whole map
+    forest_ok = True if whole else None
     if spec.get('osm'):                    # the real resort's trails and lifts (OpenStreetMap data saved with the map)
         progress(0.01, 'Laying out the real trails and lifts...')
         try:
@@ -589,13 +590,18 @@ def _build(spec, dem, game, out_dir, cancel, progress):
         clear = resort.clear_mask(pl, spec['size_m'])
         idx = np.minimum((np.arange(G) * fr.sp / clear[1]).astype(int), clear[0].shape[0] - 1)
         avoid = clear[0][np.ix_(idx, idx)]
-        if pl['tree_check']:               # the forest round the resort as it really is (open bowls, glades' trees)
-            try:
-                cover = resort.tree_cover(pl, terrain, lambda la, lo: canopy.heights(
-                    la, lo, cancel, lambda f, t: progress(0.015, t), nodata=resort.COVER_NODATA))
-            except (net.NetError, canopy.CanopyError, OSError) as ex:
-                log.warning('real tree cover failed: %s', ex)
+    # the forest as it really is: round the resort (open bowls, glades' trees), or over the whole map
+    if whole or (pl and pl['tree_check']):
+        terrain = terrain or resort.Terrain(H, fr, spec['lat'], spec['lon'], spec['size_m'])
+        try:
+            cover = resort.tree_cover(None if whole else pl, terrain, lambda la, lo: canopy.heights(
+                la, lo, cancel, lambda f, t: progress(0.015, t), nodata=resort.COVER_NODATA))
+        except (net.NetError, canopy.CanopyError, OSError) as ex:
+            log.warning('real tree cover failed: %s', ex)
+            if pl:
                 pl['tree_check'] = False   # built with the generated forest: shows "Rebuild recommended"
+            if whole:
+                forest_ok = False
     row, col = base_site(H, fr, *spec['base_rc'], radius=40, avoid=avoid)
     base_h = int(H[row, col])
     cancel.check()
@@ -686,4 +692,5 @@ def _build(spec, dem, game, out_dir, cancel, progress):
                 stats=dict(peak_ft=peak_ft, vert_ft=vert_ft, base_ft=int(round(base_m * 3.28084)),
                            trees=len(recs) // trees.STRIDE, species=counts, base_rc=[row, col], snow_piles=bool(shell),
                            lifts=len(pl['lifts']) if pl else 0, trails=len(pl['trails']) if pl else 0,
-                           glades=pl['skipped'].get(resort.GLADE, 0) if pl else 0, tree_check=pl['tree_check'] if pl else None))
+                           glades=pl['skipped'].get(resort.GLADE, 0) if pl else 0, tree_check=pl['tree_check'] if pl else None,
+                           real_forest=forest_ok))
