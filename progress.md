@@ -28,6 +28,10 @@ veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" 
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
 - `tests/test_modlib.py` schlägt gelegentlich fehl (auch ohne diese Änderung): Ursache suchen
+- **Nächste Sitzung:** Option „Real forest“ umsetzen, Plan in `docs/plans/real-forest.md`: Satelliten-Kronenhöhen
+  über die ganze Karte (`resort.tree_cover(None, …)`), Checkbox im Erstellen-Dialog, Standard aus
+- Sisters bis in den Sommer spielen, dann prüfen, ob die OSM-Gletscherflächen weiß bleiben (Beleg für permanenten
+  Schnee; Auswerte-Skripte waren nur im Scratchpad)
 
 ## Entscheidungen
 
@@ -38,3 +42,10 @@ veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" 
   auf AWS zurück (Warnung im Log) statt abzubrechen
 - _Sonny vor 3DEP in der Reihenfolge_ — überschneiden sich nicht (Europa / USA), daher harmlos
 - _Sonny ist nicht feiner als AWS (1" ≈ 31 × 21 m)_ — Gewinn ist LiDAR-Qualität (Boden statt Baumkronen, schärfere Grate)
+- _Echter Wald aus Satellit, nicht aus OSM-Waldpolygonen_ — OSM-Wald oft lückenhaft (fehlende Fläche = kahler Hang),
+  Kronenhöhen weltweit und schon im Code; Standard aus, weil es das Aussehen jeder neuen Karte ändert
+- _Kein Schnee aus OSM-Gletschern_ — Schnee ist eine Simulation im Spielstand (`SnowData`, int32-Länge + zlib,
+  2× float16, Kanal 0 = Höhe in cm), startet bei 0; auf Sisters liegt der Tiefschnee schon ohne Zutun auf den
+  OSM-Gletschern (91 % der Fläche > 1 m, Median 484 cm gegenüber 63 cm daneben)
+- _Kein Fels aus OSM_ — `M_Terrain` hat keine Ebenen-Maske pro Karte; Fels nur über Hangneigung
+  (`MPC_TerrainSurface`: `RockSlopeStartDeg`, `RockSlopeFullDeg`), ginge nur mit eigenem Material
