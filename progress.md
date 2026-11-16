@@ -20,10 +20,11 @@ veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" 
   Kachel, Cache nach neuer Kachel, ohne Ordner wie bisher (`tests/test_dem.py`)
 - Mit echten Daten geprüft (578 Kacheln, Index 0,1 s): St. Anton / 47° N-Grenze / Lücke bei 14° O,
   Abweichung zu AWS im Median < 1 m, keine Naht
+- Manueller Test in der App nach Testanleitung (Ordner wählen, Laden, Vergleich, Kachelgrenze, Lücke, Karte bauen)
+  vom Nutzer als erfolgreich bestätigt (2026-11-16)
 
 ## Offen
 
-- In der App eine Sonny-Karte erstellen, im Spiel ansehen, Rebuild prüfen
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
 - `tests/test_modlib.py` schlägt gelegentlich fehl (auch ohne diese Änderung): Ursache suchen
