@@ -22,7 +22,10 @@ Fan-made; not affiliated with or endorsed by the developers of Ski-E-O!.
 ## What it does
 
 - **Any mountain on Earth.** Search a ski area, mountain or town, drag the square over it (3 to 20 km wide) and load
-  the real elevation: USGS 10 m data in the US, about 30 m everywhere else.
+  the real elevation: USGS 10 m data in the US, about 30 m everywhere else. In Europe you can use
+  [Sonny's LiDAR terrain models](https://sonny.4lima.de) (DTM Europe 1", CC BY 4.0) instead: download them, then pick
+  their folder with **Local elevation data** at the bottom. The zips can stay as they are, and wherever a tile is
+  missing the map is filled from the 30 m data.
 - **Real trails and lifts.** Switch on **Real trails and lifts** and the ski area's runs and lifts from
   OpenStreetMap are built into the map, ready when you start a New Game, each run as wide as its real cut through
   the forest. Near the runs the forest follows the real tree cover, so open bowls stay open and glades stay wooded.
@@ -140,9 +143,10 @@ built or uploaded by hand. Three ways to check one:
 What the app connects to: GitHub at each start (this repository's latest release, for updates), map tiles
 (OpenStreetMap, OpenTopoMap, Esri World Imagery), place search (Photon, Nominatim), elevation data (USGS 3DEP, AWS
 Terrain Tiles) and, with **Real trails and lifts** on, the OpenStreetMap ski data (Overpass API) and tree canopy
-heights (Meta / WRI, AWS Open Data). retoc downloads the Oodle compression library on first use. No accounts, no
-telemetry. It writes to `%LOCALAPPDATA%\SkiEO Map Creator` and the game's `Content\Paks\~mods` folder (and, once,
-takes out what its old Mod Library put into the game, [above](#mods)); never to your saves.
+heights (Meta / WRI, AWS Open Data). Local elevation tiles are only read from the folder you pick. retoc downloads the
+Oodle compression library on first use. No accounts, no telemetry. It writes to `%LOCALAPPDATA%\SkiEO Map Creator`
+and the game's `Content\Paks\~mods` folder (and, once, takes out what its old Mod Library put into the game,
+[above](#mods)); never to your saves.
 
 ## For developers
 

@@ -144,12 +144,13 @@
             <button class="link" id="unitsBtn"></button>
             <button class="link" id="repairBtn" title="Rebuild the game's map list from the installed maps">Repair map list</button>
             <button class="link" id="diagBtn" title="Copy the app log to the clipboard, to share when asking for help">Copy diagnostics</button>
+            <span><button class="link" id="demBtn"></button> <button class="link hidden" id="demOff" title="Stop using the local elevation tiles">&times;</button></span>
             <span class="ver"><span id="ver"></span> &middot; <button class="link" id="updBtn" title="Look for a newer Map Creator on GitHub">Check for updates</button></span>
           </div>
           <div class="attrib">Map data &copy; <button class="link" data-link="osm">OpenStreetMap</button> contributors,
             style <button class="link" data-link="otm">OpenTopoMap</button> (CC-BY-SA), satellite <button class="link" data-link="esri">Esri, Maxar, Earthstar Geographics</button> &middot; Search
             <button class="link" data-link="photon">Photon</button>, <button class="link" data-link="nominatim">Nominatim</button> &middot; Elevation <button class="link" data-link="usgs">USGS 3DEP</button>,
-            <button class="link" data-link="terrain">Terrain Tiles</button> &middot; Tree heights <button class="link" data-link="chm">Meta, WRI</button> (CC-BY)
+            <button class="link" data-link="terrain">Terrain Tiles</button><span id="demAttrib" class="hidden">, DTM Europe by <button class="link" data-link="sonny">Sonny</button> (CC-BY)</span> &middot; Tree heights <button class="link" data-link="chm">Meta, WRI</button> (CC-BY)
             &middot; <button class="link" data-link="leaflet">Leaflet</button></div>
         </footer>
       </div>

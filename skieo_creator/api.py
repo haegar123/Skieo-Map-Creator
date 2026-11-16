@@ -34,6 +34,7 @@ LINKS = {
     'photon': 'https://photon.komoot.io/',
     'usgs': 'https://www.usgs.gov/3d-elevation-program',
     'terrain': 'https://registry.opendata.aws/terrain-tiles/',
+    'sonny': 'https://sonny.4lima.de/',
     'chm': 'https://registry.opendata.aws/dataforgood-fb-forests/',
     'leaflet': 'https://leafletjs.com/',
 }
@@ -192,7 +193,7 @@ class Api:
     def init(self):
         if not self._busy():
             self._clean_incomplete()
-        return dict(version=VERSION, app=APP_NAME, game=self._game_status(), biomes=biomes.listing(),
+        return dict(version=VERSION, app=APP_NAME, game=self._game_status(), biomes=biomes.listing(), dem=self._dem_status(),
                     settings={k: self._settings.get(k) for k in SETTING_KEYS}, maps=self._maps(), token=server.TOKEN,
                     limits=dict(min_km=MIN_KM, max_km=MAX_KM, min_trees=trees.MIN_TREES, max_trees=trees.max_trees(MAX_KM),
                                 trees_per_km2=trees.TREES_PER_KM2, tree_cap=trees.TREE_BUDGET,
@@ -280,6 +281,30 @@ class Api:
                 return dict(game=self._game_status(), changed=True)
         raise UserError('That folder doesn\'t look like the Ski-E-O game folder (the one that contains '
                         '"SkiResortSimulator").')
+
+    def _dem_status(self):
+        f = self._settings.get('dem_folder')
+        return dict(folder=f, tiles=len(dem.sonny_index(f)) if f else 0)
+
+    @_safe
+    def pick_dem_folder(self):
+        """the folder of Sonny's DTM Europe 1" tiles (.hgt, their zips, or zips of those)"""
+        r = self._window.create_file_dialog(20, directory=self._settings.get('dem_folder') or '')  # 20 = FileDialog.FOLDER
+        if not r:
+            return dict(dem=self._dem_status(), changed=False)
+        p = r[0] if isinstance(r, (list, tuple)) else r
+        n = len(dem.sonny_index(p))
+        if not n:
+            raise UserError('No 1" elevation tiles in that folder (files like N47E009.hgt or N47E009.zip, also inside '
+                            'bigger zips).')
+        self._settings.set(dem_folder=str(p))
+        log.info('local elevation folder %s: %d tiles', p, n)
+        return dict(dem=self._dem_status(), changed=True)
+
+    @_safe
+    def clear_dem_folder(self):
+        self._settings.set(dem_folder=None)
+        return dict(dem=self._dem_status())
 
     def _require_game(self):
         st = self._game_status()
@@ -424,7 +449,8 @@ class Api:
 
     def _do_preview(self, job, lat, lon, size_km):
         size_m = size_km * 1000.0
-        d, src = dem.load(lat, lon, size_m, job.cancel, lambda f, t: job.progress(0.75 * f, t))
+        d, src = dem.load(lat, lon, size_m, job.cancel, lambda f, t: job.progress(0.75 * f, t),
+                          folder=self._settings.get('dem_folder'))
         job.progress(0.78, 'Analysing the terrain...')
         H, fr = builder.heights(d, size_m)
         slope = builder.slope_deg(H, fr)
@@ -598,10 +624,11 @@ class Api:
         if p['osm']:                       # kept with the map, so a rebuild makes the same trails and lifts
             paths.atomic_write(paths.MAPS / slug / 'osm.json', p['osm'])
             spec.update(osm=True, osm_skip=p['osm_skip'])
-        d = self._preview['dem'] if self._preview else None
+        d, src = (self._preview['dem'], p['source']) if self._preview else (None, None)
         if d is None:
-            d, _ = dem.load(p['lat'], p['lon'], p['size_m'], job.cancel, lambda f, t: job.progress(0.05 + 0.1 * f, t), prefer=p['source'])
-        rec = self._build_and_package(job, spec, d, 0.05, 0.9, order=self._next_order())
+            d, src = dem.load(p['lat'], p['lon'], p['size_m'], job.cancel, lambda f, t: job.progress(0.05 + 0.1 * f, t),
+                              prefer=p['source'], folder=self._settings.get('dem_folder'))
+        rec = self._build_and_package(job, spec, d, 0.05, 0.9, order=self._next_order(), src=src)
         self._install_when_closed(job, rec, 0.9)
         return self._map_view(rec)
 
@@ -610,19 +637,21 @@ class Api:
         used += [r.get('order', 0) for r in self._records()]
         return max([ORDER_BASE] + used) + 10
 
-    def _build_and_package(self, job, spec, d, a, b, order):
+    def _build_and_package(self, job, spec, d, a, b, order, src):
         slug = spec['slug']
         out = paths.MAPS / slug
         out.mkdir(parents=True, exist_ok=True)
         res = builder.build(spec, d, self._gd, out, job.cancel, lambda f, t: job.progress(a + (b - a) * f, t))
         res['preview'].resize((640, 360), Image.LANCZOS).save(out / 'preview.jpg', quality=85)
         pkg_name = re.sub(r'[^A-Za-z0-9 _-]+', '', spec['name']).strip().replace(' ', '_') or slug
+        credit = dem.SOURCES.get(src, {}).get('credit')       # travels with the map (CC BY for Sonny's tiles)
         man = dict(id=PREFIX + slug, name=spec['name'], version=int(spec.get('version', 1)), order=order,
                    files=res['files'], entry=res['entry'], game_build=self._game.build, format=builder.ENTRY_FORMAT,
-                   creator=dict(version=VERSION, lat=spec['lat'], lon=spec['lon'], size_m=spec['size_m'], biome=spec['biome']))
+                   creator=dict(version=VERSION, lat=spec['lat'], lon=spec['lon'], size_m=spec['size_m'], biome=spec['biome'],
+                                elevation=credit))
         pkg = out / (pkg_name + '.skimap')
         install.make_package(pkg, man, out)
-        rec = dict(slug=slug, name=spec['name'], order=order, spec=spec, stats=res['stats'], package=pkg.name,
+        rec = dict(slug=slug, name=spec['name'], order=order, spec=spec, stats=res['stats'], package=pkg.name, elevation=credit,
                    files=res['files'], game_fp=self._gd.fp, game_build=self._game.build, creator=VERSION, recipe=builder.recipe(spec, res['stats']),
                    created=datetime.datetime.now().isoformat(timespec='seconds'))
         paths.atomic_write(out / 'map.json', json.dumps(rec, indent=1).encode('utf-8'))
@@ -736,9 +765,9 @@ class Api:
         def work(job):
             self._prepare(job, 0.0, 0.05)
             s = dict(rec['spec'], version=int(rec.get('version', 1)) + 1)
-            d, _ = dem.load(s['lat'], s['lon'], s['size_m'], job.cancel, lambda f, t: job.progress(0.05 + 0.15 * f, t),
-                            prefer=s['source'])
-            new = self._build_and_package(job, s, d, 0.2, 0.9, order=rec.get('order', self._next_order()))
+            d, src = dem.load(s['lat'], s['lon'], s['size_m'], job.cancel, lambda f, t: job.progress(0.05 + 0.15 * f, t),
+                              prefer=s['source'], folder=self._settings.get('dem_folder'))
+            new = self._build_and_package(job, s, d, 0.2, 0.9, order=rec.get('order', self._next_order()), src=src)
             new['version'] = s['version']
             paths.atomic_write(paths.MAPS / slug / 'map.json', json.dumps(new, indent=1).encode('utf-8'))
             self._install_when_closed(job, new, 0.9)

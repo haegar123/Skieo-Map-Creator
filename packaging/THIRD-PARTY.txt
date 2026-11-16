@@ -27,5 +27,8 @@ Map and elevation data (downloaded while you use the app)
 * Place search: Photon by komoot (OpenStreetMap data) and Nominatim (OpenStreetMap Foundation)
 * Elevation inside the USA: USGS 3D Elevation Program (public domain)
 * Elevation elsewhere: Terrain Tiles on AWS Open Data (Mapzen; sources include SRTM, GMTED2010, ETOPO1, 3DEP and others)
+* Optional, from a folder on your PC (not downloaded or included): DTM Europe 1" v25 by Sonny, CC BY 4.0 --
+  https://sonny.4lima.de -- resampled onto the map's grid; the national LiDAR sources it is made from are listed in
+  its _Datasources.txt
 * Tree canopy heights (to leave out glades and size the runs): Meta and World Resources Institute (WRI), Global Canopy Height Map v2,
   CC BY 4.0, on AWS Open Data -- https://registry.opendata.aws/dataforgood-fb-forests/

@@ -7,7 +7,10 @@ For players, see the [README](../README.md).
 
 1. **Elevation**: USGS 3DEP 1/3 arc-second (~10 m) inside the US, AWS Terrain Tiles (~30 m) elsewhere
    (`dem.py`). It is resampled onto the game's 2017 x 2017 landscape grid on a local transverse Mercator projection
-   (`geo.py`).
+   (`geo.py`). When the player picks a folder of Sonny's DTM Europe 1" tiles (`.hgt`, a tile's zip, or zips of
+   those, read straight from the zips), the tiles under the window come first (`dem.sonny_index`,
+   `dem._fetch_sonny`): joined across tile edges, the gaps (no tile, or no data) filled from Terrain Tiles with a
+   soft edge. The credit (CC BY 4.0) goes with the map, in its `map.json` and the `.skimap` manifest.
 2. **The template and the game's data**: every map is the Map Creator's own template (`data/map_template.zip`), made from
    scratch in the mod kit and laid out like the game's own maps: a level (landscape of 32 x 32 components, the
    environment settings, 64 snow shell pieces, the edge wall, the game mode and the shared level), a forest, map
@@ -162,7 +165,7 @@ python packaging/make_save_template.py <a .sav with a ticket office> <out>\SkiRe
 | `tests/ui_drive.py` | scripted UI sessions with screenshots (`search`, `3d`, `3d-offline`, `numbox`, `osm`, ...) |
 | `tests/test_resort.py` | self-check of the trail and lift import rules on made-up data |
 | `tests/test_trees.py` | self-check of the forest on a made-up mountain (no game, no downloads) |
-| `tests/test_dem.py` | self-check of reading where the USGS elevation image really is (its GeoTIFF tags) |
+| `tests/test_dem.py` | self-check of reading where the USGS elevation image really is (its GeoTIFF tags), and of Sonny's local tiles on made-up data (finding them in folders and zips, joining them across tile edges, filling gaps) |
 | `tests/test_update.py` | self-check of the self-update (release lookup, checksums, swapping the exe) without the network |
 | `tests/test_install.py` | self-check of the map list entries (never a tutorial map, the once-only rebuild of older ones) |
 | `tests/test_map_package.py` | self-check that a map package holds only a map, with stand-in containers made from the game's files (skipped without the game) |

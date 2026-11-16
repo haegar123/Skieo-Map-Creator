@@ -62,7 +62,7 @@ def retoc():
 
 
 class Settings:
-    DEFAULTS = {'game_folder': None, 'units': 'ft', 'layer': 'topo', 'view': None}
+    DEFAULTS = {'game_folder': None, 'units': 'ft', 'layer': 'topo', 'view': None, 'dem_folder': None}
 
     def __init__(self):
         self.data = dict(self.DEFAULTS)

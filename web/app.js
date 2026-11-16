@@ -824,6 +824,27 @@ async function copyDiagnostics() {
 }
 $('diagBtn').onclick = copyDiagnostics;
 
+function renderDem(d) {
+  const on = !!(d && d.folder);
+  $('demBtn').textContent = on ? `Local elevation: ${d.tiles} tiles` : 'Local elevation data...';
+  $('demBtn').title = on ? `Sonny's DTM Europe 1" tiles from ${d.folder}, used first where they cover the area. Click to pick another folder.`
+    : 'Use Sonny\'s DTM Europe 1" elevation tiles (LiDAR, sonny.4lima.de) from a folder on this PC';
+  $('demOff').classList.toggle('hidden', !on);
+  $('demAttrib').classList.toggle('hidden', !on);
+}
+$('demBtn').onclick = async () => {
+  const r = await call('pick_dem_folder');
+  if (!r.ok) return errorBox(r.error);
+  renderDem(r.dem);
+  if (r.changed) toast(`${r.dem.tiles} elevation tiles found. Load the terrain again to use them.`);
+};
+$('demOff').onclick = async () => {
+  const r = await call('clear_dem_folder');
+  if (!r.ok) return errorBox(r.error);
+  renderDem(r.dem);
+  toast('Local elevation tiles are no longer used.');
+};
+
 $('updBtn').onclick = async () => {
   const b = $('updBtn');
   if (b.disabled) return;
@@ -849,6 +870,7 @@ async function start() {
   const r = await call('init');
   if (!r.ok) return errorBox(r.error);
   $('ver').textContent = 'v' + r.version;
+  renderDem(r.dem);
   S.biomes = r.biomes;
   S.limits = r.limits;
   fillBiomes(r.biomes);
