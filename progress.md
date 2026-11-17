@@ -45,13 +45,8 @@ Installation ins Spiel. Die Mod Library ist upstream entfernt, Mods kommen jetzt
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
 - Branch `backup-vor-update` (Stand vor dem 1.9.0-Rebase) löschen, wenn nicht mehr gebraucht:
   `git branch -D backup-vor-update`
-- Gletscher ganzjährig weiß (OSM-Umrisse, als Lua-Mod gewünscht): Plan entworfen, Umsetzung zurückgestellt. Die
-  Mod Library gibt es nicht mehr, der Mod müsste über Z's Mod Loader verteilt werden. Zuerst klären, ob Lua Schnee
-  setzen kann (UE4SS-Dump, Sommertest auf Sisters)
 - Real forest: Offline-Fall (Netz aus, Cache leer → „Rebuild recommended“) noch nicht in der App geprüft
 - 3D-Wald: noch nicht geprüft mit Real forest an, mit OSM-Pisten und auf 20-km-Karte (Bildrate)
-- Sisters bis in den Sommer spielen, dann prüfen, ob die OSM-Gletscherflächen weiß bleiben (Beleg für permanenten
-  Schnee; Auswerte-Skripte waren nur im Scratchpad)
 
 ## Entscheidungen
 
@@ -70,8 +65,7 @@ Installation ins Spiel. Die Mod Library ist upstream entfernt, Mods kommen jetzt
   Spiel; Kegel ohne Schattenwurf und nur eine Form (200k Schattenkegel zu teuer; Arten trennen, wenn gewünscht)
 - _Design-Hook: `broken-image` in `web/index.html` ignoriert_ (`.impeccable/config.json`) — `#diorama`/`#doneImg`
   bekommen ihr `src` zur Laufzeit von `app.js`
-- _Kein Schnee aus OSM-Gletschern_ — Schnee ist eine Simulation im Spielstand (`SnowData`, int32-Länge + zlib,
-  2× float16, Kanal 0 = Höhe in cm), startet bei 0; auf Sisters liegt der Tiefschnee schon ohne Zutun auf den
-  OSM-Gletschern (91 % der Fläche > 1 m, Median 484 cm gegenüber 63 cm daneben)
+- _Kein Gletscher-Mod_ (2026-11-17 verworfen, zu komplex) — befahrbar macht eine Piste nur Schnee, keine Textur;
+  Sommerschnee ginge nur über Temperatur per Lua-Mod. Im Winter liegt auf OSM-Gletschern ohnehin Tiefschnee
 - _Kein Fels aus OSM_ — `M_Terrain` hat keine Ebenen-Maske pro Karte; Fels nur über Hangneigung
   (`MPC_TerrainSurface`: `RockSlopeStartDeg`, `RockSlopeFullDeg`), ginge nur mit eigenem Material
