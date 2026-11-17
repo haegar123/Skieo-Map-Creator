@@ -2,9 +2,10 @@
 
 ## Stand
 
-Map Creator 1.8.2: echtes Gelände (USGS 3DEP in den USA, AWS Terrain Tiles sonst), Wald nach Spiel-Biomen mit
-Baumbudget, echte Pisten und Lifte aus OpenStreetMap, Installation ins Spiel, Mod Library. Neu (noch nicht
-veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" v25" aus einem lokalen Ordner; Option
+Map Creator 1.9.0 (upstream oofbyte, eigene Commits darauf rebased am 2026-11-17): echtes Gelände (USGS 3DEP in
+den USA, AWS Terrain Tiles sonst), Wald nach Spiel-Biomen mit Baumbudget, echte Pisten und Lifte aus OpenStreetMap,
+Installation ins Spiel. Die Mod Library ist upstream entfernt, Mods kommen jetzt über Z's Mod Loader
+(`oldmods.py` räumt Altes einmal weg). Neu (noch nicht veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" v25" aus einem lokalen Ordner; Option
 „Real forest“ (Bäume nur, wo Satellitenbilder Wald zeigen); 3D-Ansicht zeigt den Wald der Karte.
 
 ## Erledigt
@@ -38,7 +39,12 @@ veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" 
 
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
-- `tests/test_modlib.py` schlägt gelegentlich fehl (auch ohne diese Änderung): Ursache suchen
+- Nach Update auf 1.9.0: App starten und Sonny-Ordner, Real forest und 3D-Wald einmal prüfen (Self-Checks alle grün;
+  Tests laufen mit `py -3.12 tests/test_*.py`, Python 3.14 hat die Abhängigkeiten nicht). Sicherung des alten Stands:
+  Branch `backup-vor-update`, löschen nach der Prüfung
+- Gletscher ganzjährig weiß (OSM-Umrisse, als Lua-Mod gewünscht): Plan entworfen, Umsetzung zurückgestellt. Die
+  Mod Library gibt es nicht mehr, der Mod müsste über Z's Mod Loader verteilt werden. Zuerst klären, ob Lua Schnee
+  setzen kann (UE4SS-Dump, Sommertest auf Sisters)
 - Real forest: Offline-Fall (Netz aus, Cache leer → „Rebuild recommended“) noch nicht in der App geprüft
 - 3D-Wald: noch nicht geprüft mit Real forest an, mit OSM-Pisten und auf 20-km-Karte (Bildrate)
 - Sisters bis in den Sommer spielen, dann prüfen, ob die OSM-Gletscherflächen weiß bleiben (Beleg für permanenten
