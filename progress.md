@@ -34,14 +34,17 @@ Installation ins Spiel. Die Mod Library ist upstream entfernt, Mods kommen jetzt
   im 3D-Lade-Pill, Esc bricht ab). Gemeinsame Waldlogik für Vorschau und Build: `trees.growable`,
   `builder.forest_inputs` (`skieo_creator/view3d.py`, `web/viewer3d.js`, `web/app.js`); Test `tests/test_view3d.py`;
   in der App (Killington) geprüft, vom Nutzer abgenommen (2026-11-16)
+- Update auf upstream 1.9.0: eigene Commits per Rebase auf `origin/main` gesetzt, Konflikte nur in `README.md`,
+  `CHANGELOG.md` („Next version“ über v1.9.0), `docs/DEVELOPMENT.md`. Self-Checks alle grün
+  (`py -3.12 tests/test_*.py`; Python 3.14 hat die Abhängigkeiten nicht), in der App vom Nutzer geprüft:
+  Sonny-Ordner, Real forest, 3D-Wald gehen (2026-11-17)
 
 ## Offen
 
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
-- Nach Update auf 1.9.0: App starten und Sonny-Ordner, Real forest und 3D-Wald einmal prüfen (Self-Checks alle grün;
-  Tests laufen mit `py -3.12 tests/test_*.py`, Python 3.14 hat die Abhängigkeiten nicht). Sicherung des alten Stands:
-  Branch `backup-vor-update`, löschen nach der Prüfung
+- Branch `backup-vor-update` (Stand vor dem 1.9.0-Rebase) löschen, wenn nicht mehr gebraucht:
+  `git branch -D backup-vor-update`
 - Gletscher ganzjährig weiß (OSM-Umrisse, als Lua-Mod gewünscht): Plan entworfen, Umsetzung zurückgestellt. Die
   Mod Library gibt es nicht mehr, der Mod müsste über Z's Mod Loader verteilt werden. Zuerst klären, ob Lua Schnee
   setzen kann (UE4SS-Dump, Sommertest auf Sisters)
