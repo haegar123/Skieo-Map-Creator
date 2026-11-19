@@ -53,8 +53,6 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
 
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
-- Branches `backup-vor-update` (vor 1.9.0-Rebase) und `backup-vor-1.10` (vor 1.10.0-Rebase) löschen, wenn nicht
-  mehr gebraucht: `git branch -D backup-vor-update backup-vor-1.10`
 - Real forest: Offline-Fall (Netz aus, Cache leer → „Rebuild recommended“) noch nicht in der App geprüft
 - 3D-Wald: noch nicht geprüft mit Real forest an, mit OSM-Pisten und auf 20-km-Karte (Bildrate)
 
