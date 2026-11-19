@@ -2,9 +2,11 @@
 
 ## Stand
 
-Map Creator 1.9.0 (upstream oofbyte, eigene Commits darauf rebased am 2026-11-17): echtes Gelände (USGS 3DEP in
+Map Creator 1.10.0 (upstream oofbyte, eigene Commits darauf rebased am 2026-11-19): echtes Gelände (USGS 3DEP in
 den USA, AWS Terrain Tiles sonst), Wald nach Spiel-Biomen mit Baumbudget, echte Pisten und Lifte aus OpenStreetMap,
-Installation ins Spiel. Die Mod Library ist upstream entfernt, Mods kommen jetzt über Z's Mod Loader
+Installation ins Spiel. Seit 1.10 baut jede Karte auf einer eigenen Vorlage (`data/map_template.zip`) statt auf einer
+Kopie von Mad River Glen; die exe des Spiels wird nicht mehr gepatcht (über 1,5 Mio. Bäume braucht „Oof's Tree
+Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Loader
 (`oldmods.py` räumt Altes einmal weg). Neu (noch nicht veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" v25" aus einem lokalen Ordner; Option
 „Real forest“ (Bäume nur, wo Satellitenbilder Wald zeigen); 3D-Ansicht zeigt den Wald der Karte.
 
@@ -38,13 +40,21 @@ Installation ins Spiel. Die Mod Library ist upstream entfernt, Mods kommen jetzt
   `CHANGELOG.md` („Next version“ über v1.9.0), `docs/DEVELOPMENT.md`. Self-Checks alle grün
   (`py -3.12 tests/test_*.py`; Python 3.14 hat die Abhängigkeiten nicht), in der App vom Nutzer geprüft:
   Sonny-Ordner, Real forest, 3D-Wald gehen (2026-11-17)
+- Update auf upstream 1.10.0 (2026-11-19): Rebase mit `-X ignore-cr-at-eol` (upstream wechselt Zeilenenden je Datei),
+  danach jede Datei auf die Zeilenenden von `origin/main` gebracht. Echte Konflikte: `trees.plant` nimmt jetzt
+  `stats()['density']` statt Spender-Records (Signatur `plant(H, sp, sc, rng, ok, …)`), `growable` bleibt davor;
+  Startsave in `builder._build` ist upstream neu (`startsave.build`), bekommt `resort.Terrain(...)` direkt, weil
+  `forest_inputs` kein `terrain` zurückgibt; „Real forest“-Schalter über der neuen expWarn-Meldung; CHANGELOG
+  „Next version“ über v1.10.0. Alle 10 Self-Checks grün (`py -3.12 tests/test_*.py`)
 
 ## Offen
 
+- 1.10.0-Update in der App prüfen: Karte bauen (neue Vorlage) mit Sonny-Ordner, Real forest, OSM; 3D-Wald
+
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
-- Branch `backup-vor-update` (Stand vor dem 1.9.0-Rebase) löschen, wenn nicht mehr gebraucht:
-  `git branch -D backup-vor-update`
+- Branches `backup-vor-update` (vor 1.9.0-Rebase) und `backup-vor-1.10` (vor 1.10.0-Rebase) löschen, wenn nicht
+  mehr gebraucht: `git branch -D backup-vor-update backup-vor-1.10`
 - Real forest: Offline-Fall (Netz aus, Cache leer → „Rebuild recommended“) noch nicht in der App geprüft
 - 3D-Wald: noch nicht geprüft mit Real forest an, mit OSM-Pisten und auf 20-km-Karte (Bildrate)
 
