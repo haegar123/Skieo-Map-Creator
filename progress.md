@@ -45,11 +45,11 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
   `stats()['density']` statt Spender-Records (Signatur `plant(H, sp, sc, rng, ok, …)`), `growable` bleibt davor;
   Startsave in `builder._build` ist upstream neu (`startsave.build`), bekommt `resort.Terrain(...)` direkt, weil
   `forest_inputs` kein `terrain` zurückgibt; „Real forest“-Schalter über der neuen expWarn-Meldung; CHANGELOG
-  „Next version“ über v1.10.0. Alle 10 Self-Checks grün (`py -3.12 tests/test_*.py`)
+  „Next version“ über v1.10.0. Alle 10 Self-Checks grün (`py -3.12 tests/test_*.py`); in der App und im Spiel vom
+  Nutzer geprüft und abgenommen (2026-11-19)
 
 ## Offen
 
-- 1.10.0-Update in der App prüfen: Karte bauen (neue Vorlage) mit Sonny-Ordner, Real forest, OSM; 3D-Wald
 
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
