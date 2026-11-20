@@ -320,7 +320,7 @@ export async function open(opts) {
     const camera = new THREE.PerspectiveCamera(42, 1, s / 2000, s * 8);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    R = { renderer, scene, camera, data: res, heights, tex: { terrain: tex, topo: null }, exag: opts.exag || 1.5 };
+    R = { renderer, scene, camera, data: res, heights, tex: { terrain: tex, topo: null }, exag: opts.exag || 1 };
     const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95, metalness: 0 });
     R.mesh = new THREE.Mesh(buildTerrain(res, heights, R.exag), mat);
     R.mesh.castShadow = R.mesh.receiveShadow = true;
