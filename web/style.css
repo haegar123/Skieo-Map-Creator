@@ -213,6 +213,16 @@ input[type=range] { width: 100%; accent-color: var(--steel); margin: 6px 0 2px; 
 .gbtn.slate { background: var(--grey-bar); color: #fff; }
 .btn-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 .btn-row.end { justify-content: space-between; }
+/* local elevation tiles (Sonny LiDAR): dashed blue = not set, solid green = in use */
+.dem-row { display: flex; gap: 6px; margin: 2px 0 6px; }
+.dem-btn { flex: 1; display: flex; align-items: center; gap: 9px; padding: 6px 10px; border: 2px dashed var(--blue); border-radius: 4px;
+  background: rgba(255, 255, 255, .35); color: var(--blue); font-weight: 600; font-size: 14px; text-align: left; cursor: pointer; }
+.dem-btn:hover { background: rgba(255, 255, 255, .6); }
+.dem-btn.on { border-style: solid; border-color: var(--green); color: var(--green); }
+.dem-btn svg { width: 20px; height: 20px; flex: none; }
+.dem-off { width: 36px; flex: none; border: 2px solid var(--paper-line); border-radius: 4px; background: none; color: var(--ink-soft);
+  font-size: 20px; line-height: 1; cursor: pointer; }
+.dem-off:hover { color: var(--crimson); border-color: var(--crimson); }
 .link { background: none; border: 0; padding: 0; color: var(--blue); cursor: pointer; font-size: inherit; }
 .link:hover { text-decoration: underline; }
 

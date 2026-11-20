@@ -833,7 +833,8 @@ $('diagBtn').onclick = copyDiagnostics;
 
 function renderDem(d) {
   const on = !!(d && d.folder);
-  $('demBtn').textContent = on ? `Local elevation: ${d.tiles} tiles` : 'Local elevation data...';
+  $('demLbl').textContent = on ? `LiDAR elevation: ${d.tiles} tiles` : 'Use LiDAR elevation tiles...';
+  $('demBtn').classList.toggle('on', on);
   $('demBtn').title = on ? `Sonny's DTM Europe 1" tiles from ${d.folder}, used first where they cover the area. Click to pick another folder.`
     : 'Use Sonny\'s DTM Europe 1" elevation tiles (LiDAR, sonny.4lima.de) from a folder on this PC';
   $('demOff').classList.toggle('hidden', !on);

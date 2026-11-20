@@ -2,7 +2,7 @@
 
 usage: python tests/guide_shots.py <out dir>
   Runs the creator on a scratch app data folder next to <out dir> (the real settings stay as they are), with the
-  Sonny folder and game folder of the real settings: footer before and after picking the folder, St. Anton am Arlberg
+  Sonny folder and game folder of the real settings: the LiDAR button before and after picking the folder, St. Anton am Arlberg
   (8 km), the Terrain chip, the forest settings, Real forest on, the 3D view with Real forest off and on.
 """
 import json
@@ -17,7 +17,7 @@ REAL = json.loads((Path(os.environ.get('LOCALAPPDATA') or Path.home() / 'AppData
                    / 'SkiEO Map Creator' / 'settings.json').read_text())
 SONNY = REAL.get('dem_folder')
 if not SONNY:
-    sys.exit('Pick the Sonny folder in the Map Creator first (Local elevation data...).')
+    sys.exit('Pick the Sonny folder in the Map Creator first (Use LiDAR elevation tiles...).')
 SCR = OUT.resolve().parent / (OUT.name + '_appdata')
 os.environ['LOCALAPPDATA'] = str(SCR)              # before any import that reads paths.APP_DIR
 (SCR / 'SkiEO Map Creator').mkdir(parents=True, exist_ok=True)
@@ -54,7 +54,7 @@ def open3d(win, name):
 def drive(win):
     wait(win, "document.getElementById('ver').textContent.length > 0", 60)
     time.sleep(3)
-    shot('01_start')                                            # footer: "Local elevation data..."
+    shot('01_start')                                            # section 1: "Use LiDAR elevation tiles..."
     B._settings.set(dem_folder=SONNY)                           # what picking the folder does (no file dialog)
     js(win, "renderDem(%s); toast('%d elevation tiles found. Load the terrain again to use them.'); 0"
        % (json.dumps(B._dem_status()), B._dem_status()['tiles']))

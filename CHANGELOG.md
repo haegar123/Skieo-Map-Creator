@@ -3,6 +3,9 @@
 Maps made with an older version show **Rebuild recommended** in My Maps: one click on Rebuild gives them the fixes.
 
 ## v1.10.1
+- **Sonny's LiDAR tiles are easier to find**: the button moved from the footer to step 1, right above Load Terrain,
+  and turns green with the number of tiles once a folder is set. A short guide with pictures:
+  [docs/Guide-Sonny-Forest.pdf](docs/Guide-Sonny-Forest.pdf).
 - **Rock has its texture again** (Rebuild recommended): since the game update of 20 November 2026 (build 26803581)
   steep rock on Map Creator maps was plain grey. The game changed what its rock tiling setting means, and the setting
   the Map Creator used for big rock faces made the texture repeat so densely that only grey was left. Maps now use the
