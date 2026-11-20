@@ -12,6 +12,10 @@ couple of minutes.
 [![MIT license](https://img.shields.io/github/license/haegar123/Skieo-Map-Creator?color=555)](LICENSE)
 [![Europe LiDAR terrain by Sonny](https://img.shields.io/badge/Europe%20LiDAR%20terrain-by%20Sonny-c62828)](https://sonny.4lima.de)
 
+[![Download the Map Creator](https://img.shields.io/badge/1.%20Download%20the%20Map%20Creator-2e7d32?style=for-the-badge&logo=github&logoColor=white)](https://github.com/haegar123/Skieo-Map-Creator/releases/latest)
+[![Download the LiDAR tiles](https://img.shields.io/badge/2.%20Download%20the%20LiDAR%20tiles-c62828?style=for-the-badge&logo=nextcloud&logoColor=white)](https://nc.yanikruf.ch/s/TFegSqEWEZ2nkoC)
+[![Read the guide](https://img.shields.io/badge/3.%20Read%20the%20guide%20%28PDF%29-1565c0?style=for-the-badge&logo=adobeacrobatreader&logoColor=white)](docs/Guide-Sonny-Forest.pdf)
+
 <img src="docs/images/fork-cortina-lidar.jpg" alt="Cortina d'Ampezzo built from Sonny's LiDAR terrain with Real forest, in the 3D view" width="100%">
 
 <sub>Cortina d'Ampezzo from Sonny's LiDAR terrain, with Real forest, in the Map Creator's 3D view.</sub>
@@ -19,6 +23,15 @@ couple of minutes.
 </div>
 
 Fan-made; not affiliated with or endorsed by the developers of Ski-E-O!.
+
+> [!TIP]
+> ### Before you start: get the tiles and read the guide
+> 1. **[Download the LiDAR tiles](https://nc.yanikruf.ch/s/TFegSqEWEZ2nkoC)** (Sonny's DTM Europe 1") and put them in
+>    one folder. No need to unzip them.
+> 2. **[Read the Sonny and forest guide (PDF)](docs/Guide-Sonny-Forest.pdf)**: two pages with pictures, showing where
+>    to pick the folder and how to switch on Real forest.
+>
+> Without the tiles the Map Creator still works, but European maps are built from the coarser 30 m data.
 
 ## New in this fork
 
@@ -40,8 +53,8 @@ the Map Creator. It adds:
 <p align="center"><sub>The Alpstein from Sonny's LiDAR terrain: the generated forest covers almost everything, Real
 forest only where the satellite images show trees.</sub></p>
 
-Step by step with pictures: [Sonny and forest guide (PDF)](docs/Guide-Sonny-Forest.pdf). Updates come from this
-fork's releases.
+Step by step with pictures: **[Sonny and forest guide (PDF)](docs/Guide-Sonny-Forest.pdf)**. Updates come from
+this fork's releases.
 
 > [!IMPORTANT]
 > **The European terrain is Sonny's work.** [DTM Europe 1"](https://sonny.4lima.de) is a terrain model of Europe
@@ -102,10 +115,12 @@ does there</sub></p>
 1. Download **SkiEO-Map-Creator.exe** from
    [Releases](https://github.com/haegar123/Skieo-Map-Creator/releases/latest). It's one file, no install. Windows may
    warn because the exe isn't code-signed: click **More info**, then **Run anyway**.
-2. Search a mountain or ski area, drag the square over it and press **Load Terrain**.
-3. Look over the preview, name your resort, and switch on **Real trails and lifts** for a real ski area.
-4. Press **Create Map**. It takes a minute or two; if the game is open, the map is installed as soon as you close it.
-5. Start Ski-E-O!, choose **New Game** and pick your map in its region on the world map.
+2. For Europe: **[download the LiDAR tiles](https://nc.yanikruf.ch/s/TFegSqEWEZ2nkoC)** into one folder and follow
+   the **[guide (PDF)](docs/Guide-Sonny-Forest.pdf)** to pick it with **Use LiDAR elevation tiles...**.
+3. Search a mountain or ski area, drag the square over it and press **Load Terrain**.
+4. Look over the preview, name your resort, and switch on **Real trails and lifts** for a real ski area.
+5. Press **Create Map**. It takes a minute or two; if the game is open, the map is installed as soon as you close it.
+6. Start Ski-E-O!, choose **New Game** and pick your map in its region on the world map.
 
 Needs Windows 10 or 11, Ski-E-O! installed through Steam, and an internet connection. No game files are included:
 the Map Creator reads what it needs from your own copy of the game. What changed in each version:
