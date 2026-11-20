@@ -2,7 +2,7 @@
 
 ## Stand
 
-Map Creator 1.10.0 (upstream oofbyte, eigene Commits darauf rebased am 2026-11-19): echtes Gelände (USGS 3DEP in
+Map Creator 1.10.1 (upstream oofbyte 1.10.0, eigene Commits darauf rebased am 2026-11-19): echtes Gelände (USGS 3DEP in
 den USA, AWS Terrain Tiles sonst), Wald nach Spiel-Biomen mit Baumbudget, echte Pisten und Lifte aus OpenStreetMap,
 Installation ins Spiel. Seit 1.10 baut jede Karte auf einer eigenen Vorlage (`data/map_template.zip`) statt auf einer
 Kopie von Mad River Glen; die exe des Spiels wird nicht mehr gepatcht (über 1,5 Mio. Bäume braucht „Oof's Tree
@@ -58,31 +58,29 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
   startet, `verify_exe.py` meldet nur die gewollt fehlende Oodle-DLL (2026-11-20)
 - Anleitung als PDF: `docs/Anleitung-Sonny-Wald.pdf` (2 Seiten, Text durchsuchbar), aus den Artifact-Seiten
   gedruckt (2026-11-20)
+- Fels grau auf Map-Creator-Karten seit Spiel-Build 26803581 behoben (2026-11-20): `M_Terrain` holt Fels jetzt über
+  `ML_Rock`, `RockTiling` ist eine Kachelzahl (Standard 32, vorher Weltgrösse in cm, 8192). Der Override 8192 × 3 =
+  24576 kachelte 768× zu dicht → nur graue Mip-Stufe. `MATERIAL_OVERRIDES = {}`, neue Standards im Kommentar,
+  `RECIPE` 13 / `RECIPE_OSM` 17 (`skieo_creator/builder.py`). Belegt an `MI_ebenalp_f40ef4_Terrain` aus dem Karten-Pak
+  (`get_scalars` → 24576). Self-Checks grün, ebenalp neu gebaut und im Spiel vom Nutzer bestätigt
+- Version 1.10.1 (`skieo_creator/__init__.py`, `packaging/version_info.txt`, CHANGELOG „v1.10.1“ statt „Next
+  version“, enthält auch Sonny / Real forest / 3D-Wald)
 
 ## Offen
 
-- **Fels grau auf Map-Creator-Karten** (2026-11-20, Spiel-Build 26803581 vom selben Tag, 11:18). Nächste Sitzung.
-  - Befund (Nutzer): steile Felsen durchgehend gleichmässig grau auf allen Map-Creator-Karten (`ebenalp_f40ef4`,
-    `trescimed_07fe`, `valgarden_a85e`, gebaut 11:21). Vanilla-Karten in Ordnung.
-  - Kein Log-Eintrag dazu in `UE4SS.log`. Das Spiel selbst schreibt kein Log.
-  - Ausgeschlossen: veraltete Spieldaten (Cache `gamedata/6f2069af7d333c26` von 11:20, nach dem Update). Verschobene
-    Indizes in `material_params.py` (laut aktueller Mappings stimmen 15 `Parent`, 19, 28 `ScalarParameterValues`, 31).
-    Fehlende Texturen (`t_terrain_rock_*`, `t_terrain_striatedRock_*` liegen im Spiel-Pak).
-  - Verdacht: Das Spiel hat jetzt `MI_Terrain_Andes`/`_MaunaKea`/`_Tussock` und Materialebenen (`ML_Rock`,
-    `ML_Scree`, `ML_FellField_02`, `ML_TerrainOverlay` …) unter `Materials/Terrain/`. Die Vorlage
-    (`data/map_template.zip`, 17.11.) kennt nur `M_Terrain` und `M_StriatedRock`. Ob diese Dateien neu sind, ist nicht
-    geprüft. Gleichmässig grau = Material bekommt seine Textur nicht (Standardtextur).
-  - Nächster Schritt: Terrain-MI von Mad River Glen (aktuelles Spiel) mit `MI_ebenalp_f40ef4_Terrain` aus
-    `~mods/ZZZ_MC_ebenalp_f40ef4_P` vergleichen (Importe, `TextureParameterValues`, Parent), dazu was
-    `M_StriatedRock` auf Felsen der Karte (`DA_BakedObstacles_Map_*`) braucht. Auszug der Spiel-Terrain-Assets:
-    `retoc to-legacy --no-shaders -f Materials/Terrain/ <Paks> <out>`.
+- Fels-Tiling: bei grossen Felswänden auf diagonale Streifen achten (früherer Grund für den Override); falls ja,
+  `MATERIAL_OVERRIDES['RockTiling']` unter 32 im Spiel gegentesten (Richtung der neuen Kachelzahl nicht geprüft)
+- Vor dem nächsten Override: Prüfung in `gamedata._validate`, dass der Spiel-Standard noch der ist, für den er gedacht
+  war (bisher nicht nötig, es gibt keinen)
 
-- Test-exe heisst noch „1.10.0“, enthält aber Sonny/Real forest/3D-Wald — vor dem nächsten Verschicken eigene
-  Versionsbezeichnung (z. B. `1.10.0-test1`), damit Rückmeldungen zuzuordnen sind
+- Test-exe in `dist\` ist noch 1.10.0 (vor dem Fels-Fix gebaut) — vor dem Verschicken mit `packaging\build.bat`
+  neu bauen
+- Versionsnummer 1.10.1 kann mit einem künftigen upstream-1.10.1 kollidieren (Update-Prüfung hielte die exe dann
+  für aktuell) — beim nächsten Rebase prüfen
 - Anleitung: 3D-Screenshots zeigen noch Höhe 1.5× — bei der nächsten Änderung der Anleitung neu aufnehmen
 
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
-- Version, CHANGELOG und Release, wenn veröffentlicht werden soll
+- Release, wenn veröffentlicht werden soll
 - Real forest: Offline-Fall (Netz aus, Cache leer → „Rebuild recommended“) noch nicht in der App geprüft
 - 3D-Wald: noch nicht geprüft mit Real forest an, mit OSM-Pisten und auf 20-km-Karte (Bildrate)
 

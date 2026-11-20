@@ -2,7 +2,11 @@
 
 Maps made with an older version show **Rebuild recommended** in My Maps: one click on Rebuild gives them the fixes.
 
-## Next version
+## v1.10.1
+- **Rock has its texture again** (Rebuild recommended): since the game update of 20 November 2026 (build 26803581)
+  steep rock on Map Creator maps was plain grey. The game changed what its rock tiling setting means, and the setting
+  the Map Creator used for big rock faces made the texture repeat so densely that only grey was left. Maps now use the
+  game's own rock settings, like the game's maps.
 - **Real forest** (new option under Max trees, off by default): trees only where satellite images show forest
   (Meta / WRI tree heights), over the whole map. Meadows, lava fields and clearings stay open and the forest ends at
   the real forest edge. The tree heights download once (about 10–50 MB); without internet the map is built with the
