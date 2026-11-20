@@ -63,7 +63,7 @@ jobs:
           open('dist/SHA256SUMS.txt', 'w', newline='\n').write(f'{h}  SkiEO-Map-Creator.exe\n')
           tag = os.environ.get('TAG', '')
           log = open('CHANGELOG.md', encoding='utf-8').read()
-          m = re.search(rf'^## {re.escape(tag)}\b.*?\n(.*?)(?=^## |\Z)', log, re.S | re.M) if tag else None
+          m = re.search(rf'^## v?{re.escape(tag.lstrip("v"))}\b.*?\n(.*?)(?=^## |\Z)', log, re.S | re.M) if tag else None   # tag with or without the v
           run = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           notes = (m.group(1).strip() + '\n\n' if m else '') + (
               '### Download\n**SkiEO-Map-Creator.exe**: one file, no install. Windows may warn because it is unsigned: '
