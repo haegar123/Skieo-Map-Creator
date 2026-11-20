@@ -4,3 +4,4 @@ dist/
 __pycache__/
 *.pyc
 .impeccable/hook.cache.json
+tools/oo2core_9_win64.dll
