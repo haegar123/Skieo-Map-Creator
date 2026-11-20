@@ -66,14 +66,16 @@ ENTRY_FORMAT = 4                                 # 4 (1.10): the entry may name 
 #  10 (1.8.1): dead trees and living krummholz one by one among healthy ones, no dying (were whole stands: bare tops)
 #  11 (1.8.2): forests within the game's budget of tree instances (big maps ran at half the frame rate)
 #  12 (1.10.0): made from the Map Creator's own template, not a copy of a game map; no starting save (as the game's maps)
-RECIPE = 12
-RECIPE_OSM = 16                                   # with the real trails and lifts: 9 (1.6.1) without the glades,
+#  13 (1.10.1): no rock tiling override (grey rock since game build 26803581)
+RECIPE = 13
+RECIPE_OSM = 17                                  # with the real trails and lifts: 9 (1.6.1) without the glades,
                                                   # 10 (1.6.2) a run drawn twice in OSM built once, 11 (1.7.2) the
                                                   # forest round the resort follows the real tree cover, 12 (1.7.3)
                                                   # trail curves follow bends (no folded loops), 13 (1.8.0) the new
                                                   # forests, and each run as wide as its real cut through the forest,
                                                   # 14 (1.8.1) dead trees and krummholz one by one, 15 (1.8.2) the
-                                                  # tree budget, 16 (1.10.0) the template, a starting save of its own
+                                                  # tree budget, 16 (1.10.0) the template, a starting save of its own,
+                                                  # 17 (1.10.1) no rock tiling override
 BUILD_LOCK = threading.Lock()                     # frame.py holds the map frame globally: one build at a time
 
 
@@ -366,14 +368,15 @@ def terrain_material(gd, names):
     return matp.set_scalars(ua, ue, MATERIAL_OVERRIDES)
 
 
-# Terrain material settings for real-world mountains. M_Terrain's scalar defaults (cooked material, game build
-# 26187996): LapseRate 6.5, MW_LandscapeWorldUVSize 384, GrassTiling 16, Paintstrokes_Intensity 0.15, DirtSpecular 1,
-# DirtRoughness 1, DirtTiling 16, RockMetallic 0, RockTiling 8192, ScreeTiling 16, ForestDuffTiling 4,
-# DwarfShrubTiling 32, TussockTiling 32.
-# RockTiling is the rock texture's size in world cm (~82 m). Stock maps only have small rock patches; on the big faces
-# of real mountains that repeat lined up into diagonal stripes. 3x (tested in game against 1x, and against the paint
-# strokes off) reads as natural rock.
-MATERIAL_OVERRIDES = {'RockTiling': 8192.0 * 3}
+# Terrain material settings for real-world mountains (scalar overrides on the map's terrain material instance).
+# M_Terrain's scalar defaults (cooked material, game build 26803581): LapseRate 6.5, MW_LandscapeWorldUVSize 384,
+# GrassTiling 16, DirtSpecular 1, DirtRoughness 1, DirtTiling 16, RockMetallic 0, RockTiling 32, ScreeTiling 8,
+# ForestDuffTiling 4, DwarfShrubTiling 32, TussockTiling 32, VolcanicCinderTiling 64, FellfieldTiling 16.
+# Up to build 26187996 RockTiling was the rock texture's size in world cm (default 8192) and the maps had it 3x
+# (8192 * 3) against diagonal stripes on big rock faces. Build 26803581 made rock a material layer (ML_Rock) and
+# RockTiling a repeat count like the others: the old value tiled the texture so densely it drew as plain grey.
+# None for now; game defaults, as on the game's own maps.
+MATERIAL_OVERRIDES = {}
 
 
 # ---------------------------------------------------------------- other assets
