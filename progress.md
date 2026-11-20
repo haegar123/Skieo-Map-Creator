@@ -47,6 +47,11 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
   `forest_inputs` kein `terrain` zurückgibt; „Real forest“-Schalter über der neuen expWarn-Meldung; CHANGELOG
   „Next version“ über v1.10.0. Alle 10 Self-Checks grün (`py -3.12 tests/test_*.py`); in der App und im Spiel vom
   Nutzer geprüft und abgenommen (2026-11-19)
+- Deutsche Anleitung für Spieler „Sonny & Wald“ als Design-Canvas-Artifact
+  (https://claude.ai/artifact/YRytbJztoc571VVbQP4wCy): Teil 1 Sonny-Höhendaten mit rot markiertem
+  „Local elevation data…“, Teil 2 Baumfunktion mit 3D-Vergleich Real forest aus/an; im App-Look, vom Nutzer
+  abgenommen (2026-11-19). Screenshots per `tests/guide_shots.py` (St. Anton 8 km, eigener App-Datenordner,
+  Sonny- und Spielordner aus den echten Einstellungen); Zuschnitte und Markierungen von Hand, nicht im Skript
 
 ## Offen
 
