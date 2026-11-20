@@ -58,6 +58,13 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
   startet, `verify_exe.py` meldet nur die gewollt fehlende Oodle-DLL (2026-11-20)
 - Anleitung als PDF: `docs/Anleitung-Sonny-Wald.pdf` (2 Seiten, Text durchsuchbar), aus den Artifact-Seiten
   gedruckt (2026-11-20)
+- Für die Veröffentlichung als Fork (2026-11-20): Sonny-Button aus der Fußzeile in Abschnitt 1 über Load Terrain
+  verlegt, als eigener Button („Use LiDAR elevation tiles…“ gestrichelt blau, gesetzt „LiDAR elevation: N tiles“
+  grün umrandet, × daneben). Anleitung auf Englisch („Sonny & Forest Guide“, gleiches Artifact, Teil 1 mit neuen
+  Screenshots), PDF jetzt `docs/Guide-Sonny-Forest.pdf` statt der deutschen, im README verlinkt
+- Fork `haegar123/Skieo-Map-Creator` (2026-11-20): Update-Prüfung (`skieo_creator/update.py` `REPO`) und alle
+  README-Links zeigen auf den Fork, README nennt oofbyte als Original. Erstes Fork-Release soll v1.10.1 sein (1.10.1
+  war nur Test-exe, die noch bei oofbyte nach Updates sucht: Freunde brauchen die exe aus dem Fork)
 - Fels grau auf Map-Creator-Karten seit Spiel-Build 26803581 behoben (2026-11-20): `M_Terrain` holt Fels jetzt über
   `ML_Rock`, `RockTiling` ist eine Kachelzahl (Standard 32, vorher Weltgrösse in cm, 8192). Der Override 8192 × 3 =
   24576 kachelte 768× zu dicht → nur graue Mip-Stufe. `MATERIAL_OVERRIDES = {}`, neue Standards im Kommentar,

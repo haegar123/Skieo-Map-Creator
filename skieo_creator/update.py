@@ -24,7 +24,7 @@ from pathlib import Path
 from . import APP_NAME, VERSION, net
 
 log = logging.getLogger(__name__)
-REPO = 'oofbyte/Skieo-Map-Creator'
+REPO = 'haegar123/Skieo-Map-Creator'
 API = 'https://api.github.com/repos/%s/releases/' % REPO
 DOWNLOADS = 'https://github.com/%s/releases/download/' % REPO
 HOSTS = ('github.com', 'objects.githubusercontent.com', 'release-assets.githubusercontent.com')   # where they redirect

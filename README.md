@@ -6,10 +6,10 @@
 Real terrain, a forest that fits the region, and the ski area's real trails and lifts, built and installed in a
 couple of minutes.
 
-[![Download](https://img.shields.io/github/v/release/oofbyte/Skieo-Map-Creator?label=download&color=2e7d32)](https://github.com/oofbyte/Skieo-Map-Creator/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/oofbyte/Skieo-Map-Creator/total?color=1565c0)](https://github.com/oofbyte/Skieo-Map-Creator/releases)
+[![Download](https://img.shields.io/github/v/release/haegar123/Skieo-Map-Creator?label=download&color=2e7d32)](https://github.com/haegar123/Skieo-Map-Creator/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/haegar123/Skieo-Map-Creator/total?color=1565c0)](https://github.com/haegar123/Skieo-Map-Creator/releases)
 [![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)](#download-and-play)
-[![MIT license](https://img.shields.io/github/license/oofbyte/Skieo-Map-Creator?color=555)](LICENSE)
+[![MIT license](https://img.shields.io/github/license/haegar123/Skieo-Map-Creator?color=555)](LICENSE)
 
 <img src="docs/images/whistler-skimap.jpg" alt="Whistler Blackcomb's real trails and lifts in the game's Ski Map" width="100%">
 
@@ -19,13 +19,17 @@ couple of minutes.
 
 Fan-made; not affiliated with or endorsed by the developers of Ski-E-O!.
 
+This is a fork of [oofbyte/Skieo-Map-Creator](https://github.com/oofbyte/Skieo-Map-Creator) by oofbyte. It adds
+Sonny's LiDAR elevation tiles for Europe, the Real forest option and the forest in the 3D view
+([guide](docs/Guide-Sonny-Forest.pdf)). Updates come from this fork's releases.
+
 ## What it does
 
 - **Any mountain on Earth.** Search a ski area, mountain or town, drag the square over it (3 to 20 km wide) and load
   the real elevation: USGS 10 m data in the US, about 30 m everywhere else. In Europe you can use
   [Sonny's LiDAR terrain models](https://sonny.4lima.de) (DTM Europe 1", CC BY 4.0) instead: download them, then pick
-  their folder with **Local elevation data** at the bottom. The zips can stay as they are, and wherever a tile is
-  missing the map is filled from the 30 m data.
+  their folder with **Use LiDAR elevation tiles** above Load Terrain. The zips can stay as they are, and wherever a
+  tile is missing the map is filled from the 30 m data. Step by step: [the Sonny and forest guide](docs/Guide-Sonny-Forest.pdf).
 - **Real trails and lifts.** Switch on **Real trails and lifts** and the ski area's runs and lifts from
   OpenStreetMap are built into the map, ready when you start a New Game, each run as wide as its real cut through
   the forest. Near the runs the forest follows the real tree cover, so open bowls stay open and glades stay wooded.
@@ -69,7 +73,7 @@ Fan-made; not affiliated with or endorsed by the developers of Ski-E-O!.
 ## Download and play
 
 1. Download **SkiEO-Map-Creator.exe** from
-   [Releases](https://github.com/oofbyte/Skieo-Map-Creator/releases/latest). It's one file, no install. Windows may
+   [Releases](https://github.com/haegar123/Skieo-Map-Creator/releases/latest). It's one file, no install. Windows may
    warn because the exe isn't code-signed: click **More info**, then **Run anyway**.
 2. Search a mountain or ski area, drag the square over it and press **Load Terrain**.
 3. Look over the preview, name your resort, and switch on **Real trails and lifts** for a real ski area.
@@ -110,7 +114,7 @@ building packs and its merged build menu. Your maps stay.
   the limit inside the game's exe, which stops the native helpers of Z's Mod Loader; 1.10 puts the game's own value
   back.)
 - **Anything else:** press **Copy diagnostics** at the bottom of the Map Creator and paste it into an
-  [issue](https://github.com/oofbyte/Skieo-Map-Creator/issues). The log is
+  [issue](https://github.com/haegar123/Skieo-Map-Creator/issues). The log is
   `%LOCALAPPDATA%\SkiEO Map Creator\logs\creator.log`.
 
 ## Updates
@@ -129,7 +133,7 @@ built or uploaded by hand. Three ways to check one:
 1. **SHA-256**: compare with the hash on the release page and in its `SHA256SUMS.txt`:
    `certutil -hashfile SkiEO-Map-Creator.exe SHA256`
 2. **Build attestation** (signed proof of which workflow run and commit built it), with the
-   [GitHub CLI](https://cli.github.com): `gh attestation verify SkiEO-Map-Creator.exe --repo oofbyte/Skieo-Map-Creator`
+   [GitHub CLI](https://cli.github.com): `gh attestation verify SkiEO-Map-Creator.exe --repo haegar123/Skieo-Map-Creator`
 3. **Compare with the source yourself**: check out the release tag, then
    ```
    py -3.12 -m pip install -r requirements.txt
