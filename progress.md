@@ -2,12 +2,13 @@
 
 ## Stand
 
-Map Creator 1.10.1 (upstream oofbyte 1.10.0, eigene Commits darauf rebased am 2026-11-19): echtes Gelände (USGS 3DEP in
+Map Creator 1.10.1, veröffentlicht als Fork https://github.com/haegar123/Skieo-Map-Creator (`origin`; Original
+oofbyte = `upstream`, Basis dessen 1.10.0): echtes Gelände (USGS 3DEP in
 den USA, AWS Terrain Tiles sonst), Wald nach Spiel-Biomen mit Baumbudget, echte Pisten und Lifte aus OpenStreetMap,
 Installation ins Spiel. Seit 1.10 baut jede Karte auf einer eigenen Vorlage (`data/map_template.zip`) statt auf einer
 Kopie von Mad River Glen; die exe des Spiels wird nicht mehr gepatcht (über 1,5 Mio. Bäume braucht „Oof's Tree
 Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Loader
-(`oldmods.py` räumt Altes einmal weg). Neu (noch nicht veröffentlicht): in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" v25" aus einem lokalen Ordner; Option
+(`oldmods.py` räumt Altes einmal weg). Eigene Funktionen des Forks: in Europa optional Sonnys LiDAR-Höhenmodell „DTM Europe 1" v25" aus einem lokalen Ordner; Option
 „Real forest“ (Bäume nur, wo Satellitenbilder Wald zeigen); 3D-Ansicht zeigt den Wald der Karte.
 
 ## Erledigt
@@ -16,7 +17,8 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
   mit weichem Übergang (`skieo_creator/dem.py`: `sonny_index`, `_fetch_sonny`, `load(folder=…)`)
 - Kacheln werden direkt aus den Zips gelesen: lose `.hgt`, Kachel-Zip, Sammel-Zip mit Kachel-Zips; kaputte Zips und
   gleichnamige 3"-Kacheln werden übersprungen (Größe aus dem lokalen Zip-Header)
-- Datenordner einstellbar: Fußzeile „Local elevation data…“ / ×, Einstellung `dem_folder`
+- Datenordner einstellbar: Button „Use LiDAR elevation tiles…“ in Abschnitt 1 (bis 2026-11-20 in der Fußzeile) / ×,
+  Einstellung `dem_folder`
   (`skieo_creator/api.py`: `pick_dem_folder`, `clear_dem_folder`; `skieo_creator/paths.py`; `web/app.js`, `web/index.html`)
 - Quellenangabe: Terrain-Chip, Fußzeile, `map.json` und `.skimap`-Manifest (`elevation`), README, DEVELOPMENT,
   `packaging/THIRD-PARTY.txt`
@@ -63,8 +65,13 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
   grün umrandet, × daneben). Anleitung auf Englisch („Sonny & Forest Guide“, gleiches Artifact, Teil 1 mit neuen
   Screenshots), PDF jetzt `docs/Guide-Sonny-Forest.pdf` statt der deutschen, im README verlinkt
 - Fork `haegar123/Skieo-Map-Creator` (2026-11-20): Update-Prüfung (`skieo_creator/update.py` `REPO`) und alle
-  README-Links zeigen auf den Fork, README nennt oofbyte als Original. Erstes Fork-Release soll v1.10.1 sein (1.10.1
-  war nur Test-exe, die noch bei oofbyte nach Updates sucht: Freunde brauchen die exe aus dem Fork)
+  README-Links zeigen auf den Fork, README nennt oofbyte als Original. Erstes Fork-Release 1.10.1 vom Nutzer veröffentlicht
+  (Tag `1.10.1` ohne v). Die frühere Test-exe sucht noch bei oofbyte nach Updates: Freunde brauchen die exe aus dem
+  Fork. CHANGELOG v1.10.1 als erstes Fork-Release umgeschrieben, mit Sonny-Eintrag (fehlte bisher)
+- `release.yml` findet den CHANGELOG-Abschnitt jetzt auch für ein Tag ohne v (`## v?{tag.lstrip('v')}`); beim
+  Release 1.10.1 lief noch die alte Fassung, Beschreibung dort von Hand ergänzen (2026-11-20)
+- Fork-Handbuch für den Nutzer (GitHub-Einsteiger), deutsch: https://claude.ai/artifact/VcbFyHahvzcdvxyNRLuTa6 —
+  Begriffe, Release-Checkliste, upstream einbauen, Fehlerfälle (2026-11-20)
 - Fels grau auf Map-Creator-Karten seit Spiel-Build 26803581 behoben (2026-11-20): `M_Terrain` holt Fels jetzt über
   `ML_Rock`, `RockTiling` ist eine Kachelzahl (Standard 32, vorher Weltgrösse in cm, 8192). Der Override 8192 × 3 =
   24576 kachelte 768× zu dicht → nur graue Mip-Stufe. `MATERIAL_OVERRIDES = {}`, neue Standards im Kommentar,
@@ -83,12 +90,12 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
 - Vor dem nächsten Override: Prüfung in `gamedata._validate`, dass der Spiel-Standard noch der ist, für den er gedacht
   war (bisher nicht nötig, es gibt keinen)
 
-- Versionsnummer 1.10.1 kann mit einem künftigen upstream-1.10.1 kollidieren (Update-Prüfung hielte die exe dann
-  für aktuell) — beim nächsten Rebase prüfen
+- Versionsnummer kann mit einer künftigen upstream-Version kollidieren (Update-Prüfung hielte die exe dann für
+  aktuell) — beim nächsten Merge von upstream eine Nummer über beiden wählen
+- Release 1.10.1: prüfen, ob die Beschreibung den CHANGELOG-Text hat (von Hand nachzutragen, siehe oben)
 - Anleitung: 3D-Screenshots zeigen noch Höhe 1.5× — bei der nächsten Änderung der Anleitung neu aufnehmen
 
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
-- Release, wenn veröffentlicht werden soll
 - Real forest: Offline-Fall (Netz aus, Cache leer → „Rebuild recommended“) noch nicht in der App geprüft
 - 3D-Wald: noch nicht geprüft mit Real forest an, mit OSM-Pisten und auf 20-km-Karte (Bildrate)
 
@@ -111,8 +118,10 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
   bekommen ihr `src` zur Laufzeit von `app.js`
 - _Kein Gletscher-Mod_ (2026-11-17 verworfen, zu komplex) — befahrbar macht eine Piste nur Schnee, keine Textur;
   Sommerschnee ginge nur über Temperatur per Lua-Mod. Im Winter liegt auf OSM-Gletschern ohnehin Tiefschnee
-- _PDF mit Chromium headless shell (Playwright), je Seite einzeln + pypdf zusammengefügt_ — Edge druckt headless
-  hier nichts, Zen/Firefox hat kein `--print-to-pdf`, Chromium wendet benannte `@page`-Grössen nicht an; jede Seite
-  so hoch wie ihr Inhalt (Teil 1 braucht 1389 statt 1320 px). Bildschirmformat, nicht A4
+- _PDF mit Chromium headless shell (Playwright)_ — Edge druckt headless hier nichts, Zen/Firefox hat kein
+  `--print-to-pdf`. Englische Fassung: beide `<x-dc>`-Körper in eine HTML, je Seite ein benanntes `@page`
+  (`page: p0`), ging in einem Druck (`--disable-extensions --no-pdf-header-footer`). Bildschirmformat, nicht A4
+- _Upstream im Fork per Merge, nicht mehr per Rebase_ (2026-11-20) — die Geschichte ist öffentlich, ein Rebase
+  bräuchte Force-Push
 - _Kein Fels aus OSM_ — `M_Terrain` hat keine Ebenen-Maske pro Karte; Fels nur über Hangneigung
   (`MPC_TerrainSurface`: `RockSlopeStartDeg`, `RockSlopeFullDeg`), ginge nur mit eigenem Material
