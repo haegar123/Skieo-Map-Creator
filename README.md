@@ -10,26 +10,52 @@ couple of minutes.
 [![Downloads](https://img.shields.io/github/downloads/haegar123/Skieo-Map-Creator/total?color=1565c0)](https://github.com/haegar123/Skieo-Map-Creator/releases)
 [![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)](#download-and-play)
 [![MIT license](https://img.shields.io/github/license/haegar123/Skieo-Map-Creator?color=555)](LICENSE)
+[![Europe LiDAR terrain by Sonny](https://img.shields.io/badge/Europe%20LiDAR%20terrain-by%20Sonny-c62828)](https://sonny.4lima.de)
 
-<img src="docs/images/whistler-skimap.jpg" alt="Whistler Blackcomb's real trails and lifts in the game's Ski Map" width="100%">
+<img src="docs/images/fork-cortina-lidar.jpg" alt="Cortina d'Ampezzo built from Sonny's LiDAR terrain with Real forest, in the 3D view" width="100%">
 
-<sub>Whistler Blackcomb from OpenStreetMap: 518 trails and 31 lifts, in the game's own Ski Map.</sub>
+<sub>Cortina d'Ampezzo from Sonny's LiDAR terrain, with Real forest, in the Map Creator's 3D view.</sub>
 
 </div>
 
 Fan-made; not affiliated with or endorsed by the developers of Ski-E-O!.
 
-This is a fork of [oofbyte/Skieo-Map-Creator](https://github.com/oofbyte/Skieo-Map-Creator) by oofbyte. It adds
-Sonny's LiDAR elevation tiles for Europe, the Real forest option and the forest in the 3D view
-([guide](docs/Guide-Sonny-Forest.pdf)). Updates come from this fork's releases.
+## New in this fork
+
+This is a fork of [oofbyte/Skieo-Map-Creator](https://github.com/oofbyte/Skieo-Map-Creator) by oofbyte, who wrote
+the Map Creator. It adds:
+
+- **LiDAR terrain for Europe.** Build European mountains from Sonny's LiDAR terrain models instead of the 30 m data:
+  sharper ridges, and the real ground instead of the treetops.
+  **[Download the tiles](https://nc.yanikruf.ch/s/TFegSqEWEZ2nkoC)** into one folder and pick it with
+  **Use LiDAR elevation tiles...** in step 1, right above Load Terrain. The zips can stay as they are, and wherever a
+  tile is missing the map is filled from the 30 m data.
+- **Real forest.** A new option under Max trees: trees only where satellite images show forest (Meta / WRI tree
+  heights), over the whole map. Meadows and clearings stay open, and the forest ends at its real edge.
+- **The forest in the 3D view.** The 3D preview shows the trees the map will have, with the settings of the create
+  dialog: treeline, tree slope, valley floor, the real trails and lifts cut out, Real forest.
+
+<img src="docs/images/fork-alpstein-forest-compare.jpg" alt="The Alpstein with the generated forest and with Real forest" width="100%">
+
+<p align="center"><sub>The Alpstein from Sonny's LiDAR terrain: the generated forest covers almost everything, Real
+forest only where the satellite images show trees.</sub></p>
+
+Step by step with pictures: [Sonny and forest guide (PDF)](docs/Guide-Sonny-Forest.pdf). Updates come from this
+fork's releases.
+
+> [!IMPORTANT]
+> **The European terrain is Sonny's work.** [DTM Europe 1"](https://sonny.4lima.de) is a terrain model of Europe
+> that Sonny built, mainly from the national LiDAR surveys, and shares for free under
+> [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Without it this fork's best feature would not exist.
+> The Map Creator only reads the tiles from your PC; they are not included or downloaded by it
+> ([download the tiles](https://nc.yanikruf.ch/s/TFegSqEWEZ2nkoC)). **Thank you, Sonny!**
+> If you share a map built from these tiles, credit Sonny with it.
 
 ## What it does
 
 - **Any mountain on Earth.** Search a ski area, mountain or town, drag the square over it (3 to 20 km wide) and load
-  the real elevation: USGS 10 m data in the US, about 30 m everywhere else. In Europe you can use
-  [Sonny's LiDAR terrain models](https://sonny.4lima.de) (DTM Europe 1", CC BY 4.0) instead: download them, then pick
-  their folder with **Use LiDAR elevation tiles** above Load Terrain. The zips can stay as they are, and wherever a
-  tile is missing the map is filled from the 30 m data. Step by step: [the Sonny and forest guide](docs/Guide-Sonny-Forest.pdf).
+  the real elevation: USGS 10 m data in the US, about 30 m everywhere else, or
+  [Sonny's LiDAR terrain](https://sonny.4lima.de) in Europe ([above](#new-in-this-fork)).
 - **Real trails and lifts.** Switch on **Real trails and lifts** and the ski area's runs and lifts from
   OpenStreetMap are built into the map, ready when you start a New Game, each run as wide as its real cut through
   the forest. Near the runs the forest follows the real tree cover, so open bowls stay open and glades stay wooded.
@@ -40,7 +66,7 @@ Sonny's LiDAR elevation tiles for Europe, the Real forest option and the forest 
   still looks full. **Experimental mode** allows more, up to the game's full density, at a cost in frame rate (the
   game shows those trees with the **Oof's Tree Limit** mod turned on in Z's Mod Manager).
 - **Snow like the game's own maps.** Piles, banks and drifts build up through the winter.
-- **3D preview.** Look the terrain over in 3D before you build it.
+- **3D preview.** Look the terrain and its forest over in 3D before you build it.
 - **Installs itself.** The map shows up on the game's world map in its real region, with its real elevations and
   climate. **My Maps** reinstalls, removes or rebuilds your maps with the latest fixes.
 - **Updates itself** from this page's releases.
@@ -57,18 +83,19 @@ Sonny's LiDAR elevation tiles for Europe, the Real forest option and the forest 
 <td align="center"><sub>Stratton, Vermont: every run cut into the forest</sub></td>
 </tr>
 <tr>
+<td width="50%"><img src="docs/images/whistler-skimap.jpg" alt="Whistler Blackcomb's real trails and lifts in the game's Ski Map"></td>
 <td width="50%"><img src="docs/images/stratton-skimap.jpg" alt="Stratton in the game's Ski Map"></td>
-<td width="50%"><img src="docs/images/vail-skimap.jpg" alt="Vail's front side in the game's Ski Map"></td>
 </tr>
 <tr>
+<td align="center"><sub>Whistler Blackcomb in the Ski Map: 518 trails, 31 lifts</sub></td>
 <td align="center"><sub>Stratton in the Ski Map: 95 trails, 13 lifts</sub></td>
-<td align="center"><sub>Vail in the Ski Map: 215 trails, 30 lifts</sub></td>
 </tr>
 </table>
 
-<img src="docs/images/vail-back-bowls.jpg" alt="Vail's Back Bowls and Blue Sky Basin in the game's Ski Map" width="100%">
+<img src="docs/images/fork-alpstein-real-forest.jpg" alt="The Alpstein with Real forest: meadows open, forest along the gullies" width="100%">
 
-<p align="center"><sub>Vail from the west: the Back Bowls and Blue Sky Basin</sub></p>
+<p align="center"><sub>The Alpstein from Sonny's LiDAR terrain with Real forest: the meadows stay open and the forest follows the gullies, as it
+does there</sub></p>
 
 ## Download and play
 
