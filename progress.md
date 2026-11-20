@@ -52,9 +52,18 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
   „Local elevation data…“, Teil 2 Baumfunktion mit 3D-Vergleich Real forest aus/an; im App-Look, vom Nutzer
   abgenommen (2026-11-19). Screenshots per `tests/guide_shots.py` (St. Anton 8 km, eigener App-Datenordner,
   Sonny- und Spielordner aus den echten Einstellungen); Zuschnitte und Markierungen von Hand, nicht im Skript
+- 3D-Vorschau: Höhenregler startet auf 1.0× statt 1.5× (`web/viewer3d.js` Startwert `exag`, `web/index.html`)
+  (2026-11-20)
+- Test-exe für Freunde lokal gebaut mit `packaging\build.bat` (`dist\SkiEO-Map-Creator.exe`, 34 MB, nicht im Repo);
+  startet, `verify_exe.py` meldet nur die gewollt fehlende Oodle-DLL (2026-11-20)
+- Anleitung als PDF: `docs/Anleitung-Sonny-Wald.pdf` (2 Seiten, Text durchsuchbar), aus den Artifact-Seiten
+  gedruckt (2026-11-20)
 
 ## Offen
 
+- Test-exe heisst noch „1.10.0“, enthält aber Sonny/Real forest/3D-Wald — vor dem nächsten Verschicken eigene
+  Versionsbezeichnung (z. B. `1.10.0-test1`), damit Rückmeldungen zuzuordnen sind
+- Anleitung: 3D-Screenshots zeigen noch Höhe 1.5× — bei der nächsten Änderung der Anleitung neu aufnehmen
 
 - `SONNY_SMOOTH_M` (8 m) an echten Karten im Spiel feinjustieren
 - Version, CHANGELOG und Release, wenn veröffentlicht werden soll
@@ -80,5 +89,8 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
   bekommen ihr `src` zur Laufzeit von `app.js`
 - _Kein Gletscher-Mod_ (2026-11-17 verworfen, zu komplex) — befahrbar macht eine Piste nur Schnee, keine Textur;
   Sommerschnee ginge nur über Temperatur per Lua-Mod. Im Winter liegt auf OSM-Gletschern ohnehin Tiefschnee
+- _PDF mit Chromium headless shell (Playwright), je Seite einzeln + pypdf zusammengefügt_ — Edge druckt headless
+  hier nichts, Zen/Firefox hat kein `--print-to-pdf`, Chromium wendet benannte `@page`-Grössen nicht an; jede Seite
+  so hoch wie ihr Inhalt (Teil 1 braucht 1389 statt 1320 px). Bildschirmformat, nicht A4
 - _Kein Fels aus OSM_ — `M_Terrain` hat keine Ebenen-Maske pro Karte; Fels nur über Hangneigung
   (`MPC_TerrainSurface`: `RockSlopeStartDeg`, `RockSlopeFullDeg`), ginge nur mit eigenem Material
