@@ -65,6 +65,9 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
   (`get_scalars` → 24576). Self-Checks grün, ebenalp neu gebaut und im Spiel vom Nutzer bestätigt
 - Version 1.10.1 (`skieo_creator/__init__.py`, `packaging/version_info.txt`, CHANGELOG „v1.10.1“ statt „Next
   version“, enthält auch Sonny / Real forest / 3D-Wald)
+- Test-exe 1.10.1 neu gebaut mit `packaging\build.bat` (`dist\SkiEO-Map-Creator.exe`, 34,3 MB, nicht im Repo):
+  `verify_exe.py` meldet nur die gewollt fehlende Oodle-DLL, startet (Log „1.10.1 starting (frozen=True)“); Karte
+  mit der exe noch nicht gebaut (2026-11-20)
 
 ## Offen
 
@@ -73,8 +76,6 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
 - Vor dem nächsten Override: Prüfung in `gamedata._validate`, dass der Spiel-Standard noch der ist, für den er gedacht
   war (bisher nicht nötig, es gibt keinen)
 
-- Test-exe in `dist\` ist noch 1.10.0 (vor dem Fels-Fix gebaut) — vor dem Verschicken mit `packaging\build.bat`
-  neu bauen
 - Versionsnummer 1.10.1 kann mit einem künftigen upstream-1.10.1 kollidieren (Update-Prüfung hielte die exe dann
   für aktuell) — beim nächsten Rebase prüfen
 - Anleitung: 3D-Screenshots zeigen noch Höhe 1.5× — bei der nächsten Änderung der Anleitung neu aufnehmen
