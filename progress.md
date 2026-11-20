@@ -61,6 +61,22 @@ Limit“). Die Mod Library ist upstream entfernt, Mods kommen über Z's Mod Load
 
 ## Offen
 
+- **Fels grau auf Map-Creator-Karten** (2026-11-20, Spiel-Build 26803581 vom selben Tag, 11:18). Nächste Sitzung.
+  - Befund (Nutzer): steile Felsen durchgehend gleichmässig grau auf allen Map-Creator-Karten (`ebenalp_f40ef4`,
+    `trescimed_07fe`, `valgarden_a85e`, gebaut 11:21). Vanilla-Karten in Ordnung.
+  - Kein Log-Eintrag dazu in `UE4SS.log`. Das Spiel selbst schreibt kein Log.
+  - Ausgeschlossen: veraltete Spieldaten (Cache `gamedata/6f2069af7d333c26` von 11:20, nach dem Update). Verschobene
+    Indizes in `material_params.py` (laut aktueller Mappings stimmen 15 `Parent`, 19, 28 `ScalarParameterValues`, 31).
+    Fehlende Texturen (`t_terrain_rock_*`, `t_terrain_striatedRock_*` liegen im Spiel-Pak).
+  - Verdacht: Das Spiel hat jetzt `MI_Terrain_Andes`/`_MaunaKea`/`_Tussock` und Materialebenen (`ML_Rock`,
+    `ML_Scree`, `ML_FellField_02`, `ML_TerrainOverlay` …) unter `Materials/Terrain/`. Die Vorlage
+    (`data/map_template.zip`, 17.11.) kennt nur `M_Terrain` und `M_StriatedRock`. Ob diese Dateien neu sind, ist nicht
+    geprüft. Gleichmässig grau = Material bekommt seine Textur nicht (Standardtextur).
+  - Nächster Schritt: Terrain-MI von Mad River Glen (aktuelles Spiel) mit `MI_ebenalp_f40ef4_Terrain` aus
+    `~mods/ZZZ_MC_ebenalp_f40ef4_P` vergleichen (Importe, `TextureParameterValues`, Parent), dazu was
+    `M_StriatedRock` auf Felsen der Karte (`DA_BakedObstacles_Map_*`) braucht. Auszug der Spiel-Terrain-Assets:
+    `retoc to-legacy --no-shaders -f Materials/Terrain/ <Paks> <out>`.
+
 - Test-exe heisst noch „1.10.0“, enthält aber Sonny/Real forest/3D-Wald — vor dem nächsten Verschicken eigene
   Versionsbezeichnung (z. B. `1.10.0-test1`), damit Rückmeldungen zuzuordnen sind
 - Anleitung: 3D-Screenshots zeigen noch Höhe 1.5× — bei der nächsten Änderung der Anleitung neu aufnehmen
